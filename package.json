@@ -1,0 +1,17 @@
+{
+  "name": "@tokenring-ai/thinking",
+  "version": "0.2.0",
+  "description": "Scientific method reasoning service for tokenring-ai",
+  "dependencies": {
+    "@tokenring-ai/app": "0.2.0",
+    "@tokenring-ai/chat": "0.2.0",
+    "@tokenring-ai/agent": "0.2.0",
+    "zod": "^4.1.13"
+  },
+  "exports": {
+    ".": "./index.ts",
+    "./*": "./*.ts"
+  },
+  "license": "MIT",
+  "type": "module"
+}
