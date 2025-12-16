@@ -6,7 +6,7 @@
     "@tokenring-ai/app": "0.2.0",
     "@tokenring-ai/chat": "0.2.0",
     "@tokenring-ai/agent": "0.2.0",
-    "zod": "^4.1.13"
+    "zod": "catalog:"
   },
   "exports": {
     ".": "./index.ts",
