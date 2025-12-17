@@ -22,7 +22,7 @@ export class ThinkingState implements AgentStateSlice {
   }
 
   reset(what: ResetWhat[]): void {
-    if (what.includes("chat") || what.includes("thinking")) {
+    if (what.includes("chat")) {
       this.sessions.clear();
     }
   }
