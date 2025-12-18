@@ -17,4 +17,4 @@ export default {
     });
     app.addServices(new ThinkingService());
   },
-} as TokenRingPlugin;
+} satisfies TokenRingPlugin;

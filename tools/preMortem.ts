@@ -55,4 +55,4 @@ const inputSchema = z.object({
   nextThoughtNeeded: z.boolean(),
 });
 
-export default { name, description, inputSchema, execute } as TokenRingToolDefinition<typeof inputSchema>;
+export default { name, description, inputSchema, execute } satisfies TokenRingToolDefinition<typeof inputSchema>;

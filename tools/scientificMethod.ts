@@ -111,4 +111,4 @@ export default {
   description,
   inputSchema,
   execute,
-} as TokenRingToolDefinition<typeof inputSchema>;
+} satisfies TokenRingToolDefinition<typeof inputSchema>;
