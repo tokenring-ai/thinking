@@ -1,3 +1,4 @@
+import {Agent} from "@tokenring-ai/agent";
 import type {ResetWhat} from "@tokenring-ai/agent/AgentEvents";
 import type {AgentStateSlice} from "@tokenring-ai/agent/types";
 
@@ -13,13 +14,17 @@ export interface ReasoningSession {
 export class ThinkingState implements AgentStateSlice {
   name = "ThinkingState";
   sessions: Map<string, ReasoningSession> = new Map();
-  persistToSubAgents = false;
 
   constructor(data: Partial<ThinkingState> = {}) {
     if (data.sessions) {
       this.sessions = new Map(Object.entries(data.sessions));
     }
   }
+
+  transferStateFromParent(parent: Agent): void {
+    this.deserialize(parent.getState(ThinkingState).serialize());
+  }
+
 
   reset(what: ResetWhat[]): void {
     if (what.includes("chat")) {
