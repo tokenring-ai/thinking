@@ -1,18 +1,28 @@
 # @tokenring-ai/thinking
 
-Structured reasoning tools for AI agents within the TokenRing framework.
+Scientific method reasoning service with structured thinking tools and state management.
 
 ## Overview
 
-The `@tokenring-ai/thinking` package provides 13 structured reasoning tools that guide AI agents through disciplined problem-solving using proven human cognitive frameworks. Each tool enforces specific thinking patterns through structured steps and maintains persistent state across reasoning sessions.
+The `@tokenring-ai/thinking` package provides 13 structured reasoning tools that implement various thinking methodologies with persistent state management. Each tool guides AI agents through disciplined problem-solving using proven human cognitive frameworks and maintains reasoning sessions across multiple steps.
+
+## Key Features
+
+- **Structured Thinking Tools**: 13 reasoning methodologies including scientific method, design thinking, root cause analysis, and more
+- **State Management**: Persistent reasoning sessions that track progress across multiple calls
+- **Automatic Integration**: Tools automatically register with chat services and agents
+- **Session Isolation**: Independent session tracking for each reasoning tool
+- **Progress Tracking**: Monitor completed steps and reasoning progress
+- **Session Cleanup**: Clear individual or all reasoning sessions
+- **Tool Integration**: Automatically registered with Token Ring agent chat systems
 
 ## Installation
 
 ```bash
-npm install @tokenring-ai/thinking
+bun install @tokenring-ai/thinking
 ```
 
-The package automatically registers with the TokenRing application when included in your application's dependencies.
+The package automatically registers with the Token Ring application when included in your application's dependencies.
 
 ## Package Structure
 
@@ -45,7 +55,7 @@ pkg/thinking/
 Main service class that manages reasoning sessions and state persistence.
 
 ```typescript
-import ThinkingService from "@tokenring-ai/thinking";
+import { ThinkingService } from "@tokenring-ai/thinking";
 
 const thinkingService = new ThinkingService();
 thinkingService.name = "ThinkingService";
@@ -80,12 +90,12 @@ Individual reasoning session state.
 
 ```typescript
 interface ReasoningSession {
-  tool: string;                    // Tool name
-  problem: string;                 // Problem being investigated
-  stepNumber: number;              // Current step count
-  data: Record<string, any>;       // Tool-specific data storage
-  completedSteps: string[];        // Steps completed
-  complete: boolean;               // Whether reasoning is complete
+  tool: string;                  // Tool name
+  problem: string;               // Problem being investigated
+  stepNumber: number;            // Current step count
+  data: Record<string, any>;     // Tool-specific data storage
+  completedSteps: string[];      // Steps completed
+  complete: boolean;             // Whether reasoning is complete
 }
 ```
 
@@ -364,7 +374,7 @@ thinkingService.clearAll(agent);
 
 ## Configuration
 
-No additional configuration required. The package uses sensible defaults and automatically integrates with the TokenRing framework.
+No additional configuration required. The package uses sensible defaults and automatically integrates with the Token Ring framework.
 
 ## Dependencies
 
@@ -378,19 +388,19 @@ No additional configuration required. The package uses sensible defaults and aut
 ### Building
 
 ```bash
-npm run build
+bun run build
 ```
 
 ### Testing
 
 ```bash
-npm run test
+bun run test
 ```
 
 ### Linting
 
 ```bash
-npm run lint
+bun run lint
 ```
 
 ## API Reference
@@ -413,6 +423,7 @@ class ThinkingService implements TokenRingService {
 
 ```typescript
 class ThinkingState implements AgentStateSlice {
+  name: string;
   sessions: Map<string, ReasoningSession>;
   
   constructor(data?: Partial<ThinkingState>);
