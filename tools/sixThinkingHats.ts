@@ -5,7 +5,7 @@ import ThinkingService from "../ThinkingService.ts";
 
 const name = "six-thinking-hats";
 
-async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<string> {
+async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   const result = thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.hats) session.data.hats = { white: [], red: [], black: [], yellow: [], green: [], blue: [] };
@@ -27,7 +27,7 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
     };
   });
 
-  return JSON.stringify(result, null, 2);
+  return result;
 }
 
 const description = `Six thinking hats tool for parallel thinking from different perspectives.

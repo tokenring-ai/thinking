@@ -16,7 +16,7 @@ export default class ThinkingService implements TokenRingService {
 
     if (!session) {
       if (!args.problem) {
-        return { error: "Problem must be defined on first call" };
+        throw new Error("Problem must be defined on first call");
       }
       session = {
         tool: toolName,

@@ -5,7 +5,7 @@ import ThinkingService from "../ThinkingService.ts";
 
 const name = "dialectical-reasoning";
 
-async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<string> {
+async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   const result = thinkingService.processStep(name, args, agent, (session, args) => {
     if (args.step === "state_thesis") session.data.thesis = args.content;
@@ -31,7 +31,7 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
     };
   });
 
-  return JSON.stringify(result, null, 2);
+  return result;
 }
 
 const description = `Dialectical reasoning tool for considering opposing views.

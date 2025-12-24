@@ -8,7 +8,7 @@ const name = "scientific-method-reasoning";
 async function execute(
   args: z.infer<typeof inputSchema>,
   agent: Agent,
-): Promise<string> {
+): Promise<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   const result = thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.hypotheses) session.data.hypotheses = [];
@@ -58,7 +58,7 @@ async function execute(
     throw new Error(`[${name}] ${result.error}`);
   }
 
-  return JSON.stringify(result, null, 2);
+  return result;
 }
 
 const description = `A strictly disciplined reasoning tool that enforces exact adherence to the scientific method.

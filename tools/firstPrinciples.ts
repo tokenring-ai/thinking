@@ -5,7 +5,7 @@ import ThinkingService from "../ThinkingService.ts";
 
 const name = "first-principles";
 
-async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<string> {
+async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   const result = thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.assumptions) session.data.assumptions = [];
@@ -30,7 +30,7 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
     };
   });
 
-  return JSON.stringify(result, null, 2);
+  return result;
 }
 
 const description = `First principles thinking tool for breaking down to fundamental truths.

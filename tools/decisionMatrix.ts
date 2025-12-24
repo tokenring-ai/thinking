@@ -5,16 +5,16 @@ import ThinkingService from "../ThinkingService.ts";
 
 const name = "decision-matrix";
 
-async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<string> {
+async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
-  const result = thinkingService.processStep(name, args, agent, (session, args) => {
+  return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.options) session.data.options = [];
     if (!session.data.criteria) session.data.criteria = [];
     if (!session.data.scores) session.data.scores = {};
 
     if (args.step === "list_options") session.data.options.push(args.content);
     if (args.step === "define_criteria") {
-      session.data.criteria.push({ name: args.content, weight: args.weight || 1 });
+      session.data.criteria.push({name: args.content, weight: args.weight || 1});
     }
     if (args.step === "score_options" && args.option && args.criterion) {
       const key = `${args.option}:${args.criterion}`;
@@ -34,8 +34,6 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
       complete: session.complete,
     };
   });
-
-  return JSON.stringify(result, null, 2);
 }
 
 const description = `Decision matrix tool for structured multi-criteria decision making.
