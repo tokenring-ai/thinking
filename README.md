@@ -1,20 +1,23 @@
 # @tokenring-ai/thinking
 
-Scientific method reasoning service with structured thinking tools and state management.
+Structured reasoning service with 13 specialized thinking tools for disciplined problem-solving and persistent state management.
 
 ## Overview
 
-The `@tokenring-ai/thinking` package provides 13 structured reasoning tools that implement various thinking methodologies with persistent state management. Each tool guides AI agents through disciplined problem-solving using proven human cognitive frameworks and maintains reasoning sessions across multiple steps.
+The `@tokenring-ai/thinking` package provides a comprehensive suite of 13 structured reasoning tools that implement various thinking methodologies with persistent state management. Each tool guides AI agents through disciplined problem-solving using proven human cognitive frameworks and maintains reasoning sessions across multiple steps.
 
 ## Key Features
 
-- **Structured Thinking Tools**: 13 reasoning methodologies including scientific method, design thinking, root cause analysis, and more
+- **13 Structured Thinking Tools**: Scientific method, design thinking, root cause analysis, SWOT analysis, and more
 - **State Management**: Persistent reasoning sessions that track progress across multiple calls
 - **Automatic Integration**: Tools automatically register with chat services and agents
 - **Session Isolation**: Independent session tracking for each reasoning tool
 - **Progress Tracking**: Monitor completed steps and reasoning progress
 - **Session Cleanup**: Clear individual or all reasoning sessions
 - **Tool Integration**: Automatically registered with Token Ring agent chat systems
+- **Zod Validation**: Typed input schemas for all tools
+- **Error Handling**: Comprehensive error handling and validation
+- **Testing**: Full test coverage with vitest
 
 ## Installation
 
@@ -28,24 +31,30 @@ The package automatically registers with the Token Ring application when include
 
 ```
 pkg/thinking/
-├── ThinkingService.ts          # Core service implementation
-├── state/thinkingState.ts      # State management for sessions
-├── plugin.ts                   # Auto-registration plugin
-├── tools.ts                    # Tool exports
-└── tools/
-    ├── scientificMethod.ts     # Scientific method reasoning
-    ├── socraticDialogue.ts     # Socratic questioning
-    ├── designThinking.ts       # Design thinking process
-    ├── rootCauseAnalysis.ts    # 5 Whys analysis
-    ├── swotAnalysis.ts         # SWOT analysis
-    ├── preMortem.ts           # Pre-mortem analysis
-    ├── dialecticalReasoning.ts # Dialectical reasoning
-    ├── firstPrinciples.ts     # First principles thinking
-    ├── decisionMatrix.ts      # Decision matrix
-    ├── lateralThinking.ts     # Lateral thinking
-    ├── agileSprint.ts         # Agile sprint planning
-    ├── feynmanTechnique.ts    # Feynman technique
-    └── sixThinkingHats.ts     # Six thinking hats
+├── index.ts              # Package exports
+├── plugin.ts             # Auto-registration plugin
+├── ThinkingService.ts    # Core service implementation
+├── tools.ts              # Tool exports and registry
+├── state/
+│   └── thinkingState.ts  # State management for sessions
+├── tools/                # Individual tool implementations
+│   ├── scientificMethod.ts
+│   ├── socraticDialogue.ts
+│   ├── designThinking.ts
+│   ├── rootCauseAnalysis.ts
+│   ├── swotAnalysis.ts
+│   ├── preMortem.ts
+│   ├── dialecticalReasoning.ts
+│   ├── firstPrinciples.ts
+│   ├── decisionMatrix.ts
+│   ├── lateralThinking.ts
+│   ├── agileSprint.ts
+│   ├── feynmanTechnique.ts
+│   └── sixThinkingHats.ts
+├── test/                 # Test suite
+│   ├── thinkingService.test.ts
+│   └── tools.test.ts
+└── vitest.config.ts      # Test configuration
 ```
 
 ## Core Components
@@ -73,10 +82,22 @@ thinkingService.description = "Provides structured reasoning functionality";
 Agent state slice that manages reasoning session persistence.
 
 ```typescript
-interface ThinkingState {
-  sessions: Map<string, ReasoningSession>;
+import { ThinkingState } from "@tokenring-ai/thinking";
+
+interface ReasoningSession {
+  tool: string;                  // Tool name
+  problem: string;               // Problem being investigated
+  stepNumber: number;            // Current step count
+  data: Record<string, any>;     // Tool-specific data storage
+  completedSteps: string[];      // Steps completed
+  complete: boolean;             // Whether reasoning is complete
+}
+
+class ThinkingState implements AgentStateSlice {
+  name = "ThinkingState";
+  sessions: Map<string, ReasoningSession> = new Map();
   
-  // State management
+  constructor(data?: Partial<ThinkingState>);
   serialize(): object;
   deserialize(data: any): void;
   reset(what: ResetWhat[]): void;
@@ -90,12 +111,12 @@ Individual reasoning session state.
 
 ```typescript
 interface ReasoningSession {
-  tool: string;                  // Tool name
-  problem: string;               // Problem being investigated
-  stepNumber: number;            // Current step count
-  data: Record<string, any>;     // Tool-specific data storage
-  completedSteps: string[];      // Steps completed
-  complete: boolean;             // Whether reasoning is complete
+  tool: string;
+  problem: string;
+  stepNumber: number;
+  data: Record<string, any>;
+  completedSteps: string[];
+  complete: boolean;
 }
 ```
 
@@ -424,12 +445,13 @@ class ThinkingService implements TokenRingService {
 ```typescript
 class ThinkingState implements AgentStateSlice {
   name: string;
-  sessions: Map<string, ReasoningSession>;
-  
+  sessions: Map<string, ReasoningSession> = new Map();
+
   constructor(data?: Partial<ThinkingState>);
+  transferStateFromParent(parent: Agent): void;
+  reset(what: ResetWhat[]): void;
   serialize(): object;
   deserialize(data: any): void;
-  reset(what: ResetWhat[]): void;
   show(): string[];
 }
 ```
