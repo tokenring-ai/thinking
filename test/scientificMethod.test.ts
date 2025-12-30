@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import * as scientificMethodModule from "../tools/scientificMethod";
+import scientificMethod from "../tools/scientificMethod";
 
 vi.mock("zod", () => {
   const createDescribableSchema = () => ({
@@ -36,8 +36,6 @@ vi.mock("zod", () => {
 // Mock Agent module
 vi.mock("@tokenring-ai/agent/Agent", () => ({ default: {} }));
 vi.mock("@tokenring-ai/chat/types", () => ({ TokenRingToolDefinition: {} }));
-
-const scientificMethod = scientificMethodModule.default;
 
 // Mock Agent
 const createMockAgent = () => {
