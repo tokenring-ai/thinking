@@ -52,8 +52,13 @@ pkg/thinking/
 │   ├── feynmanTechnique.ts
 │   └── sixThinkingHats.ts
 ├── test/                 # Test suite
-│   ├── thinkingService.test.ts
-│   └── tools.test.ts
+│   ├── tools.test.ts
+│   ├── integration.test.ts
+│   ├── firstPrinciples.test.ts
+│   ├── decisionMatrix.test.ts
+│   ├── scientificMethod.test.ts
+│   ├── thinkingState.test.ts
+│   └── thinkingService.test.ts
 └── vitest.config.ts      # Test configuration
 ```
 
@@ -397,31 +402,26 @@ thinkingService.clearAll(agent);
 
 No additional configuration required. The package uses sensible defaults and automatically integrates with the Token Ring framework.
 
-## Dependencies
-
-- `@tokenring-ai/app`: Application framework and service management
-- `@tokenring-ai/chat`: Chat system for tool registration
-- `@tokenring-ai/agent`: Agent system for state management
-- `zod`: Schema validation for tool inputs
-
 ## Development
 
 ### Building
-
 ```bash
 bun run build
 ```
 
 ### Testing
-
 ```bash
 bun run test
 ```
 
-### Linting
-
+### Watch Tests
 ```bash
-bun run lint
+bun run test:watch
+```
+
+### Coverage
+```bash
+bun run test:coverage
 ```
 
 ## API Reference
@@ -458,4 +458,4 @@ class ThinkingState implements AgentStateSlice {
 
 ## License
 
-MIT
+MIT License - see [LICENSE](./LICENSE) file for details.
