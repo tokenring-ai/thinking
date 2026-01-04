@@ -6,7 +6,7 @@ export default class ThinkingService implements TokenRingService {
   name = "ThinkingService";
   description = "Provides structured reasoning functionality";
 
-  async attach(agent: Agent): Promise<void> {
+  attach(agent: Agent): void {
     agent.initializeState(ThinkingState, {});
   }
 
