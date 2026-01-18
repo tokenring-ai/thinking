@@ -2,10 +2,10 @@ import Agent from "@tokenring-ai/agent/Agent";
 import createTestingAgent from "@tokenring-ai/agent/test/createTestingAgent";
 import TokenRingApp from "@tokenring-ai/app";
 import createTestingApp from "@tokenring-ai/app/test/createTestingApp";
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import {beforeEach, describe, expect, it, vi} from "vitest";
 import {ThinkingState} from "../state/thinkingState";
-import tools from "../tools";
 import ThinkingService from "../ThinkingService";
+import tools from "../tools";
 
 describe("Integration Tests", () => {
   let app: TokenRingApp;

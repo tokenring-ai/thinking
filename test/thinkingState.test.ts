@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from "vitest";
-import { ThinkingState, ReasoningSession } from "../state/thinkingState";
+import {beforeEach, describe, expect, it} from "vitest";
+import {ReasoningSession, ThinkingState} from "../state/thinkingState";
 
 describe("ThinkingState", () => {
   let state: ThinkingState;

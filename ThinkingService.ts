@@ -1,6 +1,6 @@
 import Agent from "@tokenring-ai/agent/Agent";
 import {TokenRingService} from "@tokenring-ai/app/types";
-import {ThinkingState, type ReasoningSession} from "./state/thinkingState.ts";
+import {type ReasoningSession, ThinkingState} from "./state/thinkingState.ts";
 
 export default class ThinkingService implements TokenRingService {
   name = "ThinkingService";
