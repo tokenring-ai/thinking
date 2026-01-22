@@ -1,6 +1,7 @@
 import {Agent} from "@tokenring-ai/agent";
 import type {ResetWhat} from "@tokenring-ai/agent/AgentEvents";
 import type {AgentStateSlice} from "@tokenring-ai/agent/types";
+import {z} from "zod";
 
 export interface ReasoningSession {
   tool: string;
@@ -11,8 +12,13 @@ export interface ReasoningSession {
   complete: boolean;
 }
 
-export class ThinkingState implements AgentStateSlice {
+const serializationSchema = z.object({
+  sessions: z.any()
+});
+
+export class ThinkingState implements AgentStateSlice<typeof serializationSchema> {
   name = "ThinkingState";
+  serializationSchema = serializationSchema;
   sessions: Map<string, ReasoningSession> = new Map();
 
   constructor(data: Partial<ThinkingState> = {}) {
@@ -22,7 +28,8 @@ export class ThinkingState implements AgentStateSlice {
   }
 
   transferStateFromParent(parent: Agent): void {
-    this.deserialize(parent.getState(ThinkingState).serialize());
+    const parentState = parent.getState(ThinkingState);
+    this.deserialize(parentState.serialize());
   }
 
 
@@ -32,20 +39,20 @@ export class ThinkingState implements AgentStateSlice {
     }
   }
 
-  serialize(): object {
+  serialize(): z.output<typeof serializationSchema> {
     return {
       sessions: Object.fromEntries(this.sessions),
     };
   }
 
-  deserialize(data: any): void {
+  deserialize(data: z.output<typeof serializationSchema>): void {
     this.sessions = data.sessions ? new Map(Object.entries(data.sessions)) : new Map();
   }
 
   show(): string[] {
     return [
       `Active Sessions: ${this.sessions.size}`,
-      ...Array.from(this.sessions.entries()).map(([tool, s]) => 
+      ...Array.from(this.sessions.entries()).map(([tool, s]) =>
         `  ${tool}: ${s.stepNumber} steps, ${s.complete ? "complete" : "in progress"}`
       )
     ];
