@@ -4,6 +4,7 @@ import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "six-thinking-hats";
+const displayName = "Thinking/sixThinkingHats";
 
 async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
@@ -42,4 +43,4 @@ const inputSchema = z.object({
   nextThoughtNeeded: z.boolean(),
 });
 
-export default { name, description, inputSchema, execute } satisfies TokenRingToolDefinition<typeof inputSchema>;
+export default { name, displayName, description, inputSchema, execute } satisfies TokenRingToolDefinition<typeof inputSchema>;

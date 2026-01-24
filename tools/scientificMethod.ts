@@ -4,6 +4,7 @@ import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "scientific-method-reasoning";
+const displayName = "Thinking/scientificMethod";
 
 async function execute(
   args: z.infer<typeof inputSchema>,
@@ -108,6 +109,7 @@ const inputSchema = z.object({
 
 export default {
   name,
+  displayName,
   description,
   inputSchema,
   execute,
