@@ -8,7 +8,7 @@ const displayName = "Thinking/preMortem";
 
 async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
-  const result = thinkingService.processStep(name, args, agent, (session, args) => {
+  return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.failureScenarios) session.data.failureScenarios = [];
     if (!session.data.mitigations) session.data.mitigations = [];
 
@@ -39,8 +39,6 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
       complete: session.complete,
     };
   });
-
-  return result;
 }
 
 const description = `Pre-mortem analysis tool for imagining failure to prevent it.

@@ -8,7 +8,7 @@ const displayName = "Thinking/designThinking";
 
 async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
-  const result = thinkingService.processStep(name, args, agent, (session, args) => {
+  return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.userNeeds) session.data.userNeeds = [];
     if (!session.data.ideas) session.data.ideas = [];
     if (!session.data.prototypes) session.data.prototypes = [];
@@ -31,8 +31,6 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
       complete: session.complete,
     };
   });
-
-  return result;
 }
 
 const description = `Design thinking tool for human-centered problem solving.

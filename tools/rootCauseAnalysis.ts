@@ -8,11 +8,11 @@ const displayName = "Thinking/rootCauseAnalysis";
 
 async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
-  const result = thinkingService.processStep(name, args, agent, (session, args) => {
+  return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.whyChain) session.data.whyChain = [];
 
     if (args.step === "ask_why") {
-      session.data.whyChain.push({ level: session.data.whyChain.length + 1, answer: args.content });
+      session.data.whyChain.push({level: session.data.whyChain.length + 1, answer: args.content});
     }
     if (args.step === "identify_root_cause") {
       session.data.rootCause = args.content;
@@ -32,8 +32,6 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
       complete: session.complete,
     };
   });
-
-  return result;
 }
 
 const description = `Root cause analysis (5 Whys) tool for drilling down to fundamental causes.

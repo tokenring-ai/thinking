@@ -8,7 +8,7 @@ const displayName = "Thinking/lateralThinking";
 
 async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
-  const result = thinkingService.processStep(name, args, agent, (session, args) => {
+  return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.stimuli) session.data.stimuli = [];
     if (!session.data.connections) session.data.connections = [];
     if (!session.data.insights) session.data.insights = [];
@@ -30,8 +30,6 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
       complete: session.complete,
     };
   });
-
-  return result;
 }
 
 const description = `Lateral thinking tool for creative problem reframing.

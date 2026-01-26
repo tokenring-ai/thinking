@@ -8,8 +8,8 @@ const displayName = "Thinking/sixThinkingHats";
 
 async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
-  const result = thinkingService.processStep(name, args, agent, (session, args) => {
-    if (!session.data.hats) session.data.hats = { white: [], red: [], black: [], yellow: [], green: [], blue: [] };
+  return thinkingService.processStep(name, args, agent, (session, args) => {
+    if (!session.data.hats) session.data.hats = {white: [], red: [], black: [], yellow: [], green: [], blue: []};
 
     if (args.hat) {
       session.data.hats[args.hat].push(args.content);
@@ -27,8 +27,6 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
       complete: session.complete,
     };
   });
-
-  return result;
 }
 
 const description = `Six thinking hats tool for parallel thinking from different perspectives.

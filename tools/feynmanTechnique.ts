@@ -8,12 +8,12 @@ const displayName = "Thinking/feynmanTechnique";
 
 async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
-  const result = thinkingService.processStep(name, args, agent, (session, args) => {
+  return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.explanations) session.data.explanations = [];
     if (!session.data.gaps) session.data.gaps = [];
     if (!session.data.analogies) session.data.analogies = [];
 
-    if (args.step === "explain_simply") session.data.explanations.push({ iteration: session.stepNumber, text: args.content });
+    if (args.step === "explain_simply") session.data.explanations.push({iteration: session.stepNumber, text: args.content});
     if (args.step === "identify_gaps") session.data.gaps.push(args.content);
     if (args.step === "use_analogies") session.data.analogies.push(args.content);
 
@@ -28,8 +28,6 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
       complete: session.complete,
     };
   });
-
-  return result;
 }
 
 const description = `Feynman technique for learning through explanation.

@@ -8,7 +8,7 @@ const displayName = "Thinking/swotAnalysis";
 
 async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
-  const result = thinkingService.processStep(name, args, agent, (session, args) => {
+  return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.strengths) session.data.strengths = [];
     if (!session.data.weaknesses) session.data.weaknesses = [];
     if (!session.data.opportunities) session.data.opportunities = [];
@@ -33,8 +33,6 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
       complete: session.complete,
     };
   });
-
-  return result;
 }
 
 const description = `SWOT analysis tool for structured strategic planning.

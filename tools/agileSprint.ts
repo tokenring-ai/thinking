@@ -8,13 +8,13 @@ const displayName = "Thinking/agileSprint";
 
 async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
-  const result = thinkingService.processStep(name, args, agent, (session, args) => {
+  return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.backlog) session.data.backlog = [];
     if (!session.data.currentSprint) session.data.currentSprint = [];
     if (!session.data.completed) session.data.completed = [];
     if (!session.data.retrospectives) session.data.retrospectives = [];
 
-    if (args.step === "break_into_stories") session.data.backlog.push({ story: args.content, estimate: args.estimate });
+    if (args.step === "break_into_stories") session.data.backlog.push({story: args.content, estimate: args.estimate});
     if (args.step === "plan_sprint") session.data.currentSprint.push(args.content);
     if (args.step === "execute") session.data.completed.push(args.content);
     if (args.step === "retrospect") session.data.retrospectives.push(args.content);
@@ -31,8 +31,6 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
       complete: session.complete,
     };
   });
-
-  return result;
 }
 
 const description = `Agile sprint planning tool for iterative development.

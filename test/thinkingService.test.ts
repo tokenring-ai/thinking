@@ -16,7 +16,7 @@ describe("ThinkingService", () => {
     app = createTestingApp();
     app.addServices(thinkingService);
     agent = createTestingAgent(app);
-    await thinkingService.attach(agent);
+    thinkingService.attach(agent);
     vi.clearAllMocks();
   });
 
@@ -34,7 +34,7 @@ describe("ThinkingService", () => {
   describe("attach", () => {
     it("should initialize ThinkingState on agent", async () => {
       const newAgent = createTestingAgent(app);
-      await thinkingService.attach(newAgent);
+      thinkingService.attach(newAgent);
       
       expect(newAgent.getState(ThinkingState)).toBeDefined();
     });

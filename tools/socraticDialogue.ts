@@ -8,16 +8,16 @@ const displayName = "Thinking/socraticDialogue";
 
 async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
-  const result = thinkingService.processStep(name, args, agent, (session, args) => {
+  return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.questions) session.data.questions = [];
     if (!session.data.assumptions) session.data.assumptions = [];
     if (!session.data.contradictions) session.data.contradictions = [];
 
     if (args.step === "question_formulation" || args.step === "challenge_assumption") {
-      session.data.questions.push({ step: session.stepNumber, content: args.content });
+      session.data.questions.push({step: session.stepNumber, content: args.content});
     }
     if (args.step === "assumption_identification") {
-      session.data.assumptions.push({ id: `a${session.data.assumptions.length + 1}`, text: args.content });
+      session.data.assumptions.push({id: `a${session.data.assumptions.length + 1}`, text: args.content});
     }
     if (args.step === "explore_contradiction") {
       session.data.contradictions.push(args.content);
@@ -34,8 +34,6 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
       complete: session.complete,
     };
   });
-
-  return result;
 }
 
 const description = `Socratic dialogue tool for questioning assumptions through structured inquiry.

@@ -8,7 +8,7 @@ const displayName = "Thinking/dialecticalReasoning";
 
 async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
-  const result = thinkingService.processStep(name, args, agent, (session, args) => {
+  return thinkingService.processStep(name, args, agent, (session, args) => {
     if (args.step === "state_thesis") session.data.thesis = args.content;
     if (args.step === "develop_antithesis") session.data.antithesis = args.content;
     if (args.step === "identify_contradictions") {
@@ -31,8 +31,6 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
       complete: session.complete,
     };
   });
-
-  return result;
 }
 
 const description = `Dialectical reasoning tool for considering opposing views.
