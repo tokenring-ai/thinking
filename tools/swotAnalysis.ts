@@ -1,12 +1,12 @@
 import Agent from "@tokenring-ai/agent/Agent";
-import {TokenRingToolDefinition} from "@tokenring-ai/chat/schema";
+import {TokenRingToolDefinition, type TokenRingToolJSONResult} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "swot-analysis";
 const displayName = "Thinking/swotAnalysis";
 
-async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
+async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promise<TokenRingToolJSONResult<any>> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.strengths) session.data.strengths = [];
@@ -21,16 +21,19 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
     if (args.step === "synthesize_strategy") session.data.strategy = args.content;
 
     return {
-      stepNumber: session.stepNumber,
-      currentStep: args.step,
-      objective: session.problem,
-      strengths: session.data.strengths,
-      weaknesses: session.data.weaknesses,
-      opportunities: session.data.opportunities,
-      threats: session.data.threats,
-      strategy: session.data.strategy,
-      completedSteps: session.completedSteps,
-      complete: session.complete,
+      type: "json",
+      data: {
+        stepNumber: session.stepNumber,
+        currentStep: args.step,
+        objective: session.problem,
+        strengths: session.data.strengths,
+        weaknesses: session.data.weaknesses,
+        opportunities: session.data.opportunities,
+        threats: session.data.threats,
+        strategy: session.data.strategy,
+        completedSteps: session.completedSteps,
+        complete: session.complete,
+      }
     };
   });
 }

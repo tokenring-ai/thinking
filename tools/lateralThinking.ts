@@ -1,12 +1,12 @@
 import Agent from "@tokenring-ai/agent/Agent";
-import {TokenRingToolDefinition} from "@tokenring-ai/chat/schema";
+import {TokenRingToolDefinition, type TokenRingToolJSONResult} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "lateral-thinking";
 const displayName = "Thinking/lateralThinking";
 
-async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
+async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promise<TokenRingToolJSONResult<any>> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.stimuli) session.data.stimuli = [];
@@ -19,15 +19,18 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
     if (args.step === "apply_to_problem") session.data.application = args.content;
 
     return {
-      stepNumber: session.stepNumber,
-      currentStep: args.step,
-      problem: session.problem,
-      stimuli: session.data.stimuli,
-      connections: session.data.connections,
-      insights: session.data.insights,
-      application: session.data.application,
-      completedSteps: session.completedSteps,
-      complete: session.complete,
+      type: "json",
+      data: {
+        stepNumber: session.stepNumber,
+        currentStep: args.step,
+        problem: session.problem,
+        stimuli: session.data.stimuli,
+        connections: session.data.connections,
+        insights: session.data.insights,
+        application: session.data.application,
+        completedSteps: session.completedSteps,
+        complete: session.complete,
+      }
     };
   });
 }

@@ -1,12 +1,12 @@
 import Agent from "@tokenring-ai/agent/Agent";
-import {TokenRingToolDefinition} from "@tokenring-ai/chat/schema";
+import {TokenRingToolDefinition, type TokenRingToolJSONResult} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "dialectical-reasoning";
 const displayName = "Thinking/dialecticalReasoning";
 
-async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
+async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promise<TokenRingToolJSONResult<any>> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (args.step === "state_thesis") session.data.thesis = args.content;
@@ -19,16 +19,19 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
     if (args.step === "synthesize") session.data.synthesis = args.content;
 
     return {
-      stepNumber: session.stepNumber,
-      currentStep: args.step,
-      problem: session.problem,
-      thesis: session.data.thesis,
-      antithesis: session.data.antithesis,
-      contradictions: session.data.contradictions || [],
-      commonGround: session.data.commonGround,
-      synthesis: session.data.synthesis,
-      completedSteps: session.completedSteps,
-      complete: session.complete,
+      type: "json",
+      data: {
+        stepNumber: session.stepNumber,
+        currentStep: args.step,
+        problem: session.problem,
+        thesis: session.data.thesis,
+        antithesis: session.data.antithesis,
+        contradictions: session.data.contradictions || [],
+        commonGround: session.data.commonGround,
+        synthesis: session.data.synthesis,
+        completedSteps: session.completedSteps,
+        complete: session.complete,
+      }
     };
   });
 }

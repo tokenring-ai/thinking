@@ -1,12 +1,12 @@
 import Agent from "@tokenring-ai/agent/Agent";
-import {TokenRingToolDefinition} from "@tokenring-ai/chat/schema";
+import {TokenRingToolDefinition, type TokenRingToolJSONResult} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "first-principles";
 const displayName = "Thinking/firstPrinciples";
 
-async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
+async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promise<TokenRingToolJSONResult<any>> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.assumptions) session.data.assumptions = [];
@@ -19,15 +19,18 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
     if (args.step === "novel_solution") session.data.solution = args.content;
 
     return {
-      stepNumber: session.stepNumber,
-      currentStep: args.step,
-      problem: session.problem,
-      assumptions: session.data.assumptions,
-      fundamentalTruths: session.data.fundamentalTruths,
-      reconstructionSteps: session.data.reconstructionSteps,
-      solution: session.data.solution,
-      completedSteps: session.completedSteps,
-      complete: session.complete,
+      type: "json",
+      data: {
+        stepNumber: session.stepNumber,
+        currentStep: args.step,
+        problem: session.problem,
+        assumptions: session.data.assumptions,
+        fundamentalTruths: session.data.fundamentalTruths,
+        reconstructionSteps: session.data.reconstructionSteps,
+        solution: session.data.solution,
+        completedSteps: session.completedSteps,
+        complete: session.complete,
+      }
     };
   });
 }

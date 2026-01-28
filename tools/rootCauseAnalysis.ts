@@ -1,12 +1,12 @@
 import Agent from "@tokenring-ai/agent/Agent";
-import {TokenRingToolDefinition} from "@tokenring-ai/chat/schema";
+import {TokenRingToolDefinition, type TokenRingToolJSONResult} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "root-cause-analysis";
 const displayName = "Thinking/rootCauseAnalysis";
 
-async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise<any> {
+async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promise<TokenRingToolJSONResult<any>> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.whyChain) session.data.whyChain = [];
@@ -22,14 +22,17 @@ async function execute(args: z.infer<typeof inputSchema>, agent: Agent): Promise
     }
 
     return {
-      stepNumber: session.stepNumber,
-      currentStep: args.step,
-      problem: session.problem,
-      whyChain: session.data.whyChain,
-      rootCause: session.data.rootCause,
-      solution: session.data.solution,
-      completedSteps: session.completedSteps,
-      complete: session.complete,
+      type: "json",
+      data: {
+        stepNumber: session.stepNumber,
+        currentStep: args.step,
+        problem: session.problem,
+        whyChain: session.data.whyChain,
+        rootCause: session.data.rootCause,
+        solution: session.data.solution,
+        completedSteps: session.completedSteps,
+        complete: session.complete,
+      }
     };
   });
 }
