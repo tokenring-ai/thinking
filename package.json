@@ -6,7 +6,7 @@
     "@tokenring-ai/app": "0.2.0",
     "@tokenring-ai/chat": "0.2.0",
     "@tokenring-ai/agent": "0.2.0",
-    "zod": "catalog:"
+    "zod": "^4.3.6"
   },
   "exports": {
     ".": "./index.ts",
@@ -15,8 +15,8 @@
   "license": "MIT",
   "type": "module",
   "devDependencies": {
-    "vitest": "catalog:",
-    "typescript": "catalog:"
+    "vitest": "^4.0.18",
+    "typescript": "^5.9.3"
   },
   "scripts": {
     "test": "vitest run",
