@@ -77,6 +77,7 @@ thinkingService.description = "Provides structured reasoning functionality";
 ```
 
 **Key Methods:**
+
 - `attach(agent: Agent)`: Initializes thinking state for an agent
 - `processStep(toolName, args, agent, processor)`: Processes reasoning steps
 - `clearSession(toolName, agent)`: Clears specific tool session
@@ -101,11 +102,13 @@ interface ReasoningSession {
 class ThinkingState implements AgentStateSlice {
   name = "ThinkingState";
   sessions: Map<string, ReasoningSession> = new Map();
-  
+
   constructor(data?: Partial<ThinkingState>);
+
+  transferStateFromParent(parent: Agent): void;
+  reset(what: ResetWhat[]): void;
   serialize(): object;
   deserialize(data: any): void;
-  reset(what: ResetWhat[]): void;
   show(): string[];
 }
 ```
@@ -139,7 +142,7 @@ await agent.executeTool('scientific-method-reasoning', {
   nextThoughtNeeded: true
 });
 
-// Available steps: question_observation, background_research, hypothesis_formulation, 
+// Available steps: question_observation, background_research, hypothesis_formulation,
 // prediction, testing_experimentation, analysis, conclusion
 ```
 
@@ -155,7 +158,7 @@ await agent.executeTool('socratic-dialogue', {
   nextThoughtNeeded: true
 });
 
-// Available steps: question_formulation, assumption_identification, 
+// Available steps: question_formulation, assumption_identification,
 // challenge_assumption, explore_contradiction, refine_understanding, synthesis
 ```
 
@@ -201,7 +204,7 @@ await agent.executeTool('swot-analysis', {
   nextThoughtNeeded: true
 });
 
-// Available steps: define_objective, strengths, weaknesses, 
+// Available steps: define_objective, strengths, weaknesses,
 // opportunities, threats, synthesize_strategy
 ```
 
@@ -218,7 +221,7 @@ await agent.executeTool('pre-mortem', {
   nextThoughtNeeded: true
 });
 
-// Available steps: define_goal, assume_failure, list_failure_reasons, 
+// Available steps: define_goal, assume_failure, list_failure_reasons,
 // assess_likelihood, develop_mitigations, revise_plan
 ```
 
@@ -234,7 +237,7 @@ await agent.executeTool('dialectical-reasoning', {
   nextThoughtNeeded: true
 });
 
-// Available steps: state_thesis, develop_antithesis, identify_contradictions, 
+// Available steps: state_thesis, develop_antithesis, identify_contradictions,
 // find_common_ground, synthesize
 ```
 
@@ -250,7 +253,7 @@ await agent.executeTool('first-principles', {
   nextThoughtNeeded: true
 });
 
-// Available steps: state_problem, identify_assumptions, challenge_assumptions, 
+// Available steps: state_problem, identify_assumptions, challenge_assumptions,
 // break_to_fundamentals, rebuild_from_basics, novel_solution
 ```
 
@@ -266,7 +269,7 @@ await agent.executeTool('decision-matrix', {
   nextThoughtNeeded: true
 });
 
-// Available steps: define_decision, list_options, define_criteria, 
+// Available steps: define_decision, list_options, define_criteria,
 // weight_criteria, score_options, calculate_decide
 ```
 
@@ -282,7 +285,7 @@ await agent.executeTool('lateral-thinking', {
   nextThoughtNeeded: true
 });
 
-// Available steps: state_problem, generate_stimulus, force_connection, 
+// Available steps: state_problem, generate_stimulus, force_connection,
 // explore_tangent, extract_insight, apply_to_problem
 ```
 
@@ -299,7 +302,7 @@ await agent.executeTool('agile-sprint', {
   nextThoughtNeeded: true
 });
 
-// Available steps: define_goal, break_into_stories, estimate_effort, 
+// Available steps: define_goal, break_into_stories, estimate_effort,
 // prioritize, plan_sprint, execute, review, retrospect
 ```
 
@@ -315,7 +318,7 @@ await agent.executeTool('feynman-technique', {
   nextThoughtNeeded: true
 });
 
-// Available steps: choose_concept, explain_simply, identify_gaps, 
+// Available steps: choose_concept, explain_simply, identify_gaps,
 // review_source, simplify_further, use_analogies
 ```
 
@@ -338,7 +341,7 @@ await agent.executeTool('six-thinking-hats', {
 
 ## Integration with TokenRing
 
-The package automatically integrates with the TokenRing application through the plugin system:
+The package automatically integrates with the Token Ring application through the plugin system:
 
 ```typescript
 // Automatically registered in plugin.ts
@@ -398,6 +401,47 @@ thinkingService.clearSession('scientific-method-reasoning', agent);
 thinkingService.clearAll(agent);
 ```
 
+### State Transfer
+
+The ThinkingState can transfer state from a parent agent:
+
+```typescript
+const childAgent = new Agent();
+const parentAgent = new Agent();
+
+// Transfer state from parent to child
+const childThinkingState = new ThinkingState();
+childThinkingState.transferStateFromParent(parentAgent);
+```
+
+### State Serialization
+
+State can be serialized and deserialized for persistence:
+
+```typescript
+const state = agent.getState(ThinkingState);
+
+// Serialize to JSON-compatible object
+const serialized = state.serialize();
+
+// Deserialize from saved state
+const newState = new ThinkingState(serialized);
+```
+
+### State Reset
+
+State can be reset based on what needs to be cleared:
+
+```typescript
+const state = agent.getState(ThinkingState);
+
+// Reset only chat-related state
+state.reset(['chat']);
+
+// Reset all state
+state.reset(['all']);
+```
+
 ## Configuration
 
 No additional configuration required. The package uses sensible defaults and automatically integrates with the Token Ring framework.
@@ -432,9 +476,9 @@ bun run test:coverage
 class ThinkingService implements TokenRingService {
   name: string;
   description: string;
-  
-  async attach(agent: Agent): Promise<void>;
-  processStep(toolName: string, args: any, agent: Agent, processor: Function): any;
+
+  attach(agent: Agent): void;
+  processStep(toolName: string, args: any, agent: Agent, processor: (session: ReasoningSession, args: any) => any): any;
   clearSession(toolName: string, agent: Agent): void;
   clearAll(agent: Agent): void;
 }
@@ -443,16 +487,30 @@ class ThinkingService implements TokenRingService {
 ### ThinkingState
 
 ```typescript
-class ThinkingState implements AgentStateSlice {
+class ThinkingState implements AgentStateSlice<typeof serializationSchema> {
   name: string;
-  sessions: Map<string, ReasoningSession> = new Map();
+  serializationSchema: typeof serializationSchema;
+  sessions: Map<string, ReasoningSession>;
 
   constructor(data?: Partial<ThinkingState>);
   transferStateFromParent(parent: Agent): void;
   reset(what: ResetWhat[]): void;
-  serialize(): object;
-  deserialize(data: any): void;
+  serialize(): z.output<typeof serializationSchema>;
+  deserialize(data: z.output<typeof serializationSchema>): void;
   show(): string[];
+}
+```
+
+### ReasoningSession
+
+```typescript
+interface ReasoningSession {
+  tool: string;
+  problem: string;
+  stepNumber: number;
+  data: Record<string, any>;
+  completedSteps: string[];
+  complete: boolean;
 }
 ```
 
