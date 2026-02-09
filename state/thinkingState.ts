@@ -17,7 +17,7 @@ const serializationSchema = z.object({
 });
 
 export class ThinkingState implements AgentStateSlice<typeof serializationSchema> {
-  name = "ThinkingState";
+  readonly name = "ThinkingState";
   serializationSchema = serializationSchema;
   sessions: Map<string, ReasoningSession> = new Map();
 

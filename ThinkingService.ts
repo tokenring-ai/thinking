@@ -3,7 +3,7 @@ import {TokenRingService} from "@tokenring-ai/app/types";
 import {type ReasoningSession, ThinkingState} from "./state/thinkingState.ts";
 
 export default class ThinkingService implements TokenRingService {
-  name = "ThinkingService";
+  readonly name = "ThinkingService";
   description = "Provides structured reasoning functionality";
 
   attach(agent: Agent): void {

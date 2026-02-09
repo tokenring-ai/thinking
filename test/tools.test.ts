@@ -31,8 +31,6 @@ describe("Tools Module", () => {
   describe("Tool Properties", () => {
     it("should have name, description, inputSchema, and execute for each tool", () => {
       Object.values(tools).forEach((tool, index) => {
-        const toolName = Object.keys(tools)[index];
-        
         expect(tool).toHaveProperty("name");
         expect(tool).toHaveProperty("description");
         expect(tool).toHaveProperty("inputSchema");
