@@ -4,9 +4,9 @@ Structured reasoning service with 13 specialized thinking tools for disciplined 
 
 ## Overview
 
-The `@tokenring-ai/thinking` package provides a comprehensive suite of 13 structured reasoning tools that implement various thinking methodologies with persistent state management. Each tool guides AI agents through disciplined problem-solving using proven human cognitive frameworks and maintains reasoning sessions across multiple steps.
+The `@tokenring-ai/thinking` package provides a comprehensive suite of 13 structured reasoning tools that implement various thinking methodologies with persistent state management. Each tool guides AI agents through disciplined problem-solving using proven human cognitive frameworks and maintains reasoning sessions across multiple calls.
 
-## Key Features
+## Features
 
 - **13 Structured Thinking Tools**: Scientific method, design thinking, root cause analysis, SWOT analysis, and more
 - **State Management**: Persistent reasoning sessions that track progress across multiple calls
@@ -72,8 +72,6 @@ Main service class that manages reasoning sessions and state persistence.
 import { ThinkingService } from "@tokenring-ai/thinking";
 
 const thinkingService = new ThinkingService();
-thinkingService.name = "ThinkingService";
-thinkingService.description = "Provides structured reasoning functionality";
 ```
 
 **Key Methods:**
@@ -99,16 +97,17 @@ interface ReasoningSession {
   complete: boolean;             // Whether reasoning is complete
 }
 
-class ThinkingState implements AgentStateSlice {
-  name = "ThinkingState";
+class ThinkingState implements AgentStateSlice<typeof serializationSchema> {
+  readonly name = "ThinkingState";
+  serializationSchema: typeof serializationSchema;
   sessions: Map<string, ReasoningSession> = new Map();
 
-  constructor(data?: Partial<ThinkingState>);
+  constructor(data: Partial<ThinkingState> = {});
 
   transferStateFromParent(parent: Agent): void;
   reset(what: ResetWhat[]): void;
-  serialize(): object;
-  deserialize(data: any): void;
+  serialize(): z.output<typeof serializationSchema>;
+  deserialize(data: z.output<typeof serializationSchema>): void;
   show(): string[];
 }
 ```
@@ -446,6 +445,73 @@ state.reset(['all']);
 
 No additional configuration required. The package uses sensible defaults and automatically integrates with the Token Ring framework.
 
+## Integration Examples
+
+### Basic Usage with an Agent
+
+```typescript
+import Agent from "@tokenring-ai/agent";
+import thinkingPlugin from "@tokenring-ai/thinking";
+
+// Create and configure agent
+const agent = new Agent({
+  workHandler: async (work) => {
+    // Handle work requests
+  }
+});
+
+// Plugin automatically registers tools with chat service
+// Tools are available via agent.executeTool()
+
+// Use a reasoning tool
+const result = await agent.executeTool('scientific-method-reasoning', {
+  problem: "Why is my application slow?",
+  step: "question_observation",
+  content: "User response times are 5+ seconds",
+  nextThoughtNeeded: true
+});
+```
+
+### Checking Session Progress
+
+```typescript
+const state = agent.getState(ThinkingState);
+console.log(state.show());
+
+// Output:
+// Active Sessions: 1
+//   scientific-method-reasoning: 3 steps, in progress
+```
+
+### Clearing Sessions
+
+```typescript
+// Clear a specific tool's session
+thinkingService.clearSession('scientific-method-reasoning', agent);
+
+// Clear all reasoning sessions
+thinkingService.clearAll(agent);
+```
+
+### Custom Tool Integration
+
+```typescript
+// Use different thinking tools for different scenarios
+await agent.executeTool('design-thinking', {
+  problem: "Improve user onboarding flow",
+  step: "empathize",
+  content: "Users feel overwhelmed during first-time setup",
+  nextThoughtNeeded: true
+});
+
+await agent.executeTool('pre-mortem', {
+  problem: "Deploying new feature Friday afternoon",
+  step: "assume_failure",
+  content: "Production outage during weekend support gap",
+  nextThoughtNeeded: true
+});
+```
+
 ## Development
 
 ### Building
@@ -474,8 +540,8 @@ bun run test:coverage
 
 ```typescript
 class ThinkingService implements TokenRingService {
-  name: string;
-  description: string;
+  readonly name = "ThinkingService";
+  readonly description = "Provides structured reasoning functionality";
 
   attach(agent: Agent): void;
   processStep(toolName: string, args: any, agent: Agent, processor: (session: ReasoningSession, args: any) => any): any;
@@ -488,11 +554,11 @@ class ThinkingService implements TokenRingService {
 
 ```typescript
 class ThinkingState implements AgentStateSlice<typeof serializationSchema> {
-  name: string;
-  serializationSchema: typeof serializationSchema;
+  readonly name = "ThinkingState";
+  readonly serializationSchema = serializationSchema;
   sessions: Map<string, ReasoningSession>;
 
-  constructor(data?: Partial<ThinkingState>);
+  constructor(data: Partial<ThinkingState> = {});
   transferStateFromParent(parent: Agent): void;
   reset(what: ResetWhat[]): void;
   serialize(): z.output<typeof serializationSchema>;
@@ -513,6 +579,47 @@ interface ReasoningSession {
   complete: boolean;
 }
 ```
+
+## Tool Schema Details
+
+### Input Schema Pattern
+
+All tools follow a consistent input schema pattern:
+
+```typescript
+z.object({
+  problem: z.string().optional(),       // Required on first call
+  step: z.enum([...]),                  // Tool-specific step enumeration
+  content: z.string(),                  // Content for the current step
+  nextThoughtNeeded: z.boolean(),       // False when reasoning is complete
+  // Tool-specific additional fields
+})
+```
+
+### Example Tool Input
+
+```typescript
+await agent.executeTool('first-principles', {
+  problem: "How can we reduce costs?",
+  step: "identify_assumptions",
+  content: "We assume we need expensive infrastructure",
+  nextThoughtNeeded: true
+});
+```
+
+## Dependencies
+
+### Production Dependencies
+
+- `@tokenring-ai/app` (0.2.0) - Application framework and service management
+- `@tokenring-ai/chat` (0.2.0) - Chat service and tool definitions
+- `@tokenring-ai/agent` (0.2.0) - Agent system and state management
+- `zod` (^4.3.6) - Schema validation
+
+### Development Dependencies
+
+- `vitest` (^4.0.18) - Testing framework
+- `typescript` (^5.9.3) - TypeScript compiler
 
 ## License
 
