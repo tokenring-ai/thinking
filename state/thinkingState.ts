@@ -23,7 +23,7 @@ export class ThinkingState implements AgentStateSlice<typeof serializationSchema
 
   constructor(data: Partial<ThinkingState> = {}) {
     if (data.sessions) {
-      this.sessions = new Map(Object.entries(data.sessions));
+      this.sessions = new Map(data.sessions.entries());
     }
   }
 
