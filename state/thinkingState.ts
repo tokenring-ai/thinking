@@ -1,6 +1,5 @@
 import {Agent} from "@tokenring-ai/agent";
-import type {ResetWhat} from "@tokenring-ai/agent/AgentEvents";
-import type {AgentStateSlice} from "@tokenring-ai/agent/types";
+import {AgentStateSlice} from "@tokenring-ai/agent/types";
 import {z} from "zod";
 
 export interface ReasoningSession {
@@ -16,12 +15,11 @@ const serializationSchema = z.object({
   sessions: z.any()
 });
 
-export class ThinkingState implements AgentStateSlice<typeof serializationSchema> {
-  readonly name = "ThinkingState";
-  serializationSchema = serializationSchema;
+export class ThinkingState extends AgentStateSlice<typeof serializationSchema> {
   sessions: Map<string, ReasoningSession> = new Map();
 
   constructor(data: Partial<ThinkingState> = {}) {
+    super("ThinkingState", serializationSchema);
     if (data.sessions) {
       this.sessions = new Map(data.sessions.entries());
     }
@@ -33,10 +31,8 @@ export class ThinkingState implements AgentStateSlice<typeof serializationSchema
   }
 
 
-  reset(what: ResetWhat[]): void {
-    if (what.includes("chat")) {
-      this.sessions.clear();
-    }
+  reset(): void {
+          this.sessions.clear();
   }
 
   serialize(): z.output<typeof serializationSchema> {

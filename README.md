@@ -86,7 +86,7 @@ const thinkingService = new ThinkingService();
 | Method | Parameters | Returns | Description |
 |--------|------------|---------|-------------|
 | `attach` | `agent: Agent` | `void` | Initializes ThinkingState for agent |
-| `processStep` | `toolName: string`, `args: any`, `agent: Agent`, `processor: (session, args) => any` | `any` | Processes step in reasoning session |
+| `processStep` | `toolName: string`, `args: any`, `agent: Agent`, `processor: (session, args) => any` | `ReasoningSession` | Processes step in reasoning session and returns updated session |
 | `clearSession` | `toolName: string`, `agent: Agent` | `void` | Clears specific tool session |
 | `clearAll` | `agent: Agent` | `void` | Clears all reasoning sessions |
 
@@ -115,7 +115,7 @@ const state = agent.getState(ThinkingState);
 |--------|------------|---------|-------------|
 | `constructor` | `data: Partial<ThinkingState>` | `void` | Create new state instance with optional initial data |
 | `transferStateFromParent` | `parent: Agent` | `void` | Transfer state from parent agent |
-| `reset` | `what: ResetWhat[]` | `void` | Reset state based on flags (e.g., `['chat']` clears sessions) |
+| `reset` | `what?: ResetWhat[]` | `void` | Reset state (clears all sessions when called) |
 | `serialize` | - | `z.output<typeof serializationSchema>` | Returns serialized state object |
 | `deserialize` | `data: z.output<typeof serializationSchema>` | `void` | Load state from serialized data |
 | `show` | - | `string[]` | Returns session summary array |
@@ -150,9 +150,33 @@ interface ReasoningSession {
 
 ### 1. Scientific Method (`scientific-method-reasoning`)
 
-Enforces strict scientific method reasoning with 7 core steps and hypothesis tracking.
+A strictly disciplined reasoning tool that enforces exact adherence to the scientific method. The tool maintains persistent state anchored to a single, fixed problem/question. Every contribution must explicitly advance one of the core steps of the scientific method.
 
-**Description:** A strictly disciplined reasoning tool that enforces exact adherence to the scientific method. The tool maintains persistent state anchored to a single, fixed problem/question. Every contribution must explicitly advance one of the core steps of the scientific method.
+**Description:**
+```
+A strictly disciplined reasoning tool that enforces exact adherence to the scientific method.
+
+The tool maintains persistent state anchored to a single, fixed problem/question. Every contribution must explicitly advance one of the core steps of the scientific method. No free-form thoughts, confidence scores, summaries, or extraneous features are permitted—only direct contributions to the defined steps.
+
+Core scientific method steps enforced:
+1. Question/Observation: Clearly state the problem and relevant observations.
+2. Background Research: Gather and restate existing knowledge, constraints, or facts.
+3. Hypothesis: Formulate testable hypotheses (one or more; each must be falsifiable).
+4. Prediction: State specific, testable predictions derived from a hypothesis.
+5. Testing/Experimentation: Perform tests (deductive reasoning, calculations, counterexamples, or external verification) to gather evidence.
+6. Analysis: Interpret evidence objectively—does it support, refute, or require refinement of the hypothesis?
+7. Conclusion: Draw evidence-based conclusion; if unresolved, iterate by revising earlier steps.
+
+The process is iterative and self-correcting. Continue until a hypothesis is conclusively supported or refuted, or the question is fully answered.
+
+Rules:
+- First call must define the problem and begin with step 1 or 2.
+- Every subsequent call must specify exactly one step and contribute only to it.
+- Hypotheses are tracked explicitly; testing and analysis must reference them.
+- Only set nextThoughtNeeded: false when a final, evidence-based conclusion is reached.
+- Ignore all irrelevant information.
+- Final answer must directly follow from the completed scientific process.
+```
 
 **Core Steps:**
 1. `question_observation` - Clearly state the problem and relevant observations
@@ -232,6 +256,13 @@ const result4 = await agent.executeTool('scientific-method-reasoning', {
 
 Questions assumptions through structured inquiry.
 
+**Description:**
+```
+Socratic dialogue tool for questioning assumptions through structured inquiry.
+
+Steps: Question formulation → Assumption identification → Challenge assumption → Explore contradiction → Refine understanding → Synthesis
+```
+
 **Steps:**
 1. `question_formulation` - Formulate the initial question
 2. `assumption_identification` - Identify underlying assumptions
@@ -277,6 +308,13 @@ await agent.executeTool('socratic-dialogue', {
 ### 3. Design Thinking (`design-thinking`)
 
 Human-centered design process.
+
+**Description:**
+```
+Design thinking tool for human-centered problem solving.
+
+Steps: Empathize → Define problem → Ideate → Prototype → Test → Iterate
+```
 
 **Steps:**
 1. `empathize` - Understand user needs and perspectives
@@ -324,6 +362,13 @@ await agent.executeTool('design-thinking', {
 
 5 Whys methodology for finding fundamental causes.
 
+**Description:**
+```
+Root cause analysis (5 Whys) tool for drilling down to fundamental causes.
+
+Steps: State problem → Ask why → Record answer → Ask why again (repeat 5x) → Identify root cause → Propose solution
+```
+
 **Steps:**
 1. `state_problem` - Clearly state the problem
 2. `ask_why` - Ask why the problem occurs
@@ -367,6 +412,13 @@ await agent.executeTool('root-cause-analysis', {
 ### 5. SWOT Analysis (`swot-analysis`)
 
 Strategic planning through strengths, weaknesses, opportunities, threats.
+
+**Description:**
+```
+SWOT analysis tool for structured strategic planning.
+
+Steps: Define objective → Identify strengths → Identify weaknesses → Identify opportunities → Identify threats → Synthesize strategy
+```
 
 **Steps:**
 1. `define_objective` - Define the objective or goal to analyze
@@ -413,6 +465,13 @@ await agent.executeTool('swot-analysis', {
 ### 6. Pre-Mortem (`pre-mortem`)
 
 Imagines failure to prevent it.
+
+**Description:**
+```
+Pre-mortem analysis tool for imagining failure to prevent it.
+
+Steps: Define goal → Assume failure → List reasons for failure → Assess likelihood → Develop mitigations → Revise plan
+```
 
 **Steps:**
 1. `define_goal` - Define the goal or plan to analyze
@@ -464,6 +523,13 @@ await agent.executeTool('pre-mortem', {
 
 Considers opposing views.
 
+**Description:**
+```
+Dialectical reasoning tool for considering opposing views.
+
+Steps: State thesis → Develop antithesis → Identify contradictions → Find common ground → Synthesize higher understanding
+```
+
 **Steps:**
 1. `state_thesis` - State the initial position or thesis
 2. `develop_antithesis` - Develop the opposing position
@@ -508,6 +574,13 @@ await agent.executeTool('dialectical-reasoning', {
 ### 8. First Principles (`first-principles`)
 
 Breaks down to fundamental truths.
+
+**Description:**
+```
+First principles thinking tool for breaking down to fundamental truths.
+
+Steps: State problem → Identify assumptions → Challenge assumptions → Break to fundamental truths → Rebuild from basics → Novel solution
+```
 
 **Steps:**
 1. `state_problem` - State the problem to solve
@@ -554,6 +627,13 @@ await agent.executeTool('first-principles', {
 ### 9. Decision Matrix (`decision-matrix`)
 
 Structured multi-criteria decision making.
+
+**Description:**
+```
+Decision matrix tool for structured multi-criteria decision making.
+
+Steps: Define decision → List options → Define criteria → Weight criteria → Score each option → Calculate totals → Decide
+```
 
 **Steps:**
 1. `define_decision` - Define the decision to be made
@@ -614,6 +694,13 @@ await agent.executeTool('decision-matrix', {
 
 Creative problem reframing.
 
+**Description:**
+```
+Lateral thinking tool for creative problem reframing.
+
+Steps: State problem → Generate random stimulus → Force connection → Explore tangent → Extract insight → Apply to original problem
+```
+
 **Steps:**
 1. `state_problem` - State the problem
 2. `generate_stimulus` - Generate random stimulus
@@ -659,6 +746,13 @@ await agent.executeTool('lateral-thinking', {
 ### 11. Agile Sprint (`agile-sprint`)
 
 Iterative development planning.
+
+**Description:**
+```
+Agile sprint planning tool for iterative development.
+
+Steps: Define goal → Break into stories → Estimate effort → Prioritize → Plan sprint → Execute → Review → Retrospect
+```
 
 **Steps:**
 1. `define_goal` - Define the sprint goal
@@ -711,6 +805,13 @@ await agent.executeTool('agile-sprint', {
 
 Learning through explanation.
 
+**Description:**
+```
+Feynman technique for learning through explanation.
+
+Steps: Choose concept → Explain simply → Identify gaps → Review source → Simplify further → Use analogies
+```
+
 **Steps:**
 1. `choose_concept` - Choose the concept to understand
 2. `explain_simply` - Explain it simply
@@ -756,6 +857,13 @@ await agent.executeTool('feynman-technique', {
 ### 13. Six Thinking Hats (`six-thinking-hats`)
 
 Parallel thinking from different perspectives.
+
+**Description:**
+```
+Six thinking hats tool for parallel thinking from different perspectives.
+
+Hats: White (facts) → Red (emotions) → Black (risks) → Yellow (benefits) → Green (creativity) → Blue (process)
+```
 
 **Hats:**
 - `white` - Facts and information
@@ -897,6 +1005,7 @@ const state = agent.getState(ThinkingState);
 
 // Serialize to JSON-compatible object
 const serialized = state.serialize();
+// Returns: { sessions: { 'scientific-method-reasoning': {...}, ... } }
 
 // Deserialize from saved state
 const newState = new ThinkingState(serialized);
@@ -904,16 +1013,13 @@ const newState = new ThinkingState(serialized);
 
 ### State Reset
 
-State can be reset based on what needs to be cleared:
+State can be reset to clear all sessions:
 
 ```typescript
 const state = agent.getState(ThinkingState);
 
-// Reset only chat-related state
-state.reset(['chat']);
-
-// Reset all state
-state.reset(['all']);
+// Reset state (clears all sessions)
+state.reset();
 ```
 
 ## Configuration
@@ -926,7 +1032,7 @@ No additional configuration required. The package uses sensible defaults and aut
 
 ```typescript
 import Agent from "@tokenring-ai/agent";
-import thinkingPlugin from "@tokenring-ai/thinking";
+import thinkingPlugin from "@tokenring-ai/thinking/plugin";
 
 // Create and configure agent
 const agent = new Agent({
@@ -1019,7 +1125,7 @@ class ThinkingService implements TokenRingService {
   readonly description = "Provides structured reasoning functionality";
 
   attach(agent: Agent): void;
-  processStep(toolName: string, args: any, agent: Agent, processor: (session: ReasoningSession, args: any) => any): any;
+  processStep(toolName: string, args: any, agent: Agent, processor: (session: ReasoningSession, args: any) => any): ReasoningSession;
   clearSession(toolName: string, agent: Agent): void;
   clearAll(agent: Agent): void;
 }
@@ -1035,7 +1141,7 @@ class ThinkingState implements AgentStateSlice<typeof serializationSchema> {
 
   constructor(data: Partial<ThinkingState> = {});
   transferStateFromParent(parent: Agent): void;
-  reset(what: ResetWhat[]): void;
+  reset(what?: ResetWhat[]): void;
   serialize(): z.output<typeof serializationSchema>;
   deserialize(data: z.output<typeof serializationSchema>): void;
   show(): string[];
