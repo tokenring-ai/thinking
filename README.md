@@ -6,13 +6,13 @@ Structured reasoning service with 13 specialized thinking tools for disciplined 
 
 The `@tokenring-ai/thinking` package provides a comprehensive suite of 13 structured reasoning tools that implement various thinking methodologies with persistent state management. Each tool guides AI agents through disciplined problem-solving using proven human cognitive frameworks and maintains reasoning sessions across multiple calls.
 
-## Features
+## Key Features
 
-- **13 Structured Thinking Tools**: Scientific method, design thinking, root cause analysis, SWOT analysis, and more
+- **13 Structured Thinking Tools**: Scientific method, design thinking, root cause analysis, SWOT analysis, pre-mortem, dialectical reasoning, first principles, decision matrix, lateral thinking, agile sprint, Feynman technique, socratic dialogue, and six thinking hats
 - **State Management**: Persistent reasoning sessions that track progress across multiple calls
-- **Automatic Integration**: Tools automatically register with chat services and agents
+- **Automatic Integration**: Tools automatically register with chat services and agents via plugin system
 - **Session Isolation**: Independent session tracking for each reasoning tool
-- **Progress Tracking**: Monitor completed steps and reasoning progress
+- **Progress Tracking**: Monitor completed steps and reasoning progress via `show()` method
 - **Session Cleanup**: Clear individual or all reasoning sessions
 - **Tool Integration**: Automatically registered with Token Ring agent chat systems
 - **Zod Validation**: Typed input schemas for all tools
@@ -25,41 +25,35 @@ The `@tokenring-ai/thinking` package provides a comprehensive suite of 13 struct
 bun install @tokenring-ai/thinking
 ```
 
-The package automatically registers with the Token Ring application when included in your application's dependencies.
+The package automatically registers with the Token Ring application when included in your application's dependencies via the plugin system.
 
 ## Package Structure
 
 ```
 pkg/thinking/
-├── index.ts              # Package exports
-├── plugin.ts             # Auto-registration plugin
-├── ThinkingService.ts    # Core service implementation
-├── tools.ts              # Tool exports and registry
+├── index.ts                    # Package exports (ThinkingService)
+├── plugin.ts                   # Auto-registration plugin
+├── ThinkingService.ts          # Core service implementation
+├── tools.ts                    # Tool exports and registry
 ├── state/
-│   └── thinkingState.ts  # State management for sessions
-├── tools/                # Individual tool implementations
-│   ├── scientificMethod.ts
-│   ├── socraticDialogue.ts
-│   ├── designThinking.ts
-│   ├── rootCauseAnalysis.ts
-│   ├── swotAnalysis.ts
-│   ├── preMortem.ts
-│   ├── dialecticalReasoning.ts
-│   ├── firstPrinciples.ts
-│   ├── decisionMatrix.ts
-│   ├── lateralThinking.ts
-│   ├── agileSprint.ts
-│   ├── feynmanTechnique.ts
-│   └── sixThinkingHats.ts
-├── test/                 # Test suite
-│   ├── tools.test.ts
-│   ├── integration.test.ts
-│   ├── firstPrinciples.test.ts
-│   ├── decisionMatrix.test.ts
-│   ├── scientificMethod.test.ts
-│   ├── thinkingState.test.ts
-│   └── thinkingService.test.ts
-└── vitest.config.ts      # Test configuration
+│   └── thinkingState.ts        # State management for sessions
+├── tools/                      # Individual tool implementations
+│   ├── scientificMethod.ts     # Scientific method reasoning
+│   ├── socraticDialogue.ts     # Socratic dialogue
+│   ├── designThinking.ts       # Design thinking
+│   ├── rootCauseAnalysis.ts    # Root cause analysis (5 Whys)
+│   ├── swotAnalysis.ts         # SWOT analysis
+│   ├── preMortem.ts            # Pre-mortem analysis
+│   ├── dialecticalReasoning.ts # Dialectical reasoning
+│   ├── firstPrinciples.ts      # First principles thinking
+│   ├── decisionMatrix.ts       # Decision matrix
+│   ├── lateralThinking.ts      # Lateral thinking
+│   ├── agileSprint.ts          # Agile sprint planning
+│   ├── feynmanTechnique.ts     # Feynman technique
+│   └── sixThinkingHats.ts      # Six thinking hats
+├── test/                       # Test suite
+│   └── *.test.ts               # Test files
+└── vitest.config.ts            # Test configuration
 ```
 
 ## Core Components
@@ -69,7 +63,7 @@ pkg/thinking/
 Main service class that manages reasoning sessions and state persistence.
 
 ```typescript
-import { ThinkingService } from "@tokenring-ai/thinking";
+import ThinkingService from "@tokenring-ai/thinking/ThinkingService";
 
 const thinkingService = new ThinkingService();
 ```
@@ -86,9 +80,37 @@ const thinkingService = new ThinkingService();
 | Method | Parameters | Returns | Description |
 |--------|------------|---------|-------------|
 | `attach` | `agent: Agent` | `void` | Initializes ThinkingState for agent |
-| `processStep` | `toolName: string`, `args: any`, `agent: Agent`, `processor: (session, args) => any` | `ReasoningSession` | Processes step in reasoning session and returns updated session |
+| `processStep` | `toolName: string`, `args: any`, `agent: Agent`, `processor: (session: ReasoningSession, args: any) => any` | `ReasoningSession` | Processes step in reasoning session and returns updated session |
 | `clearSession` | `toolName: string`, `agent: Agent` | `void` | Clears specific tool session |
 | `clearAll` | `agent: Agent` | `void` | Clears all reasoning sessions |
+
+**Usage Example:**
+
+```typescript
+import ThinkingService from "@tokenring-ai/thinking/ThinkingService";
+
+const thinkingService = new ThinkingService();
+
+// Attach to agent (called automatically by framework)
+thinkingService.attach(agent);
+
+// Process a step in a reasoning session
+const result = thinkingService.processStep(
+  'scientific-method-reasoning',
+  { problem: "My code is slow", step: "question_observation", content: "..." },
+  agent,
+  (session, args) => {
+    // Custom processing logic
+    return { processed: true };
+  }
+);
+
+// Clear a specific session
+thinkingService.clearSession('scientific-method-reasoning', agent);
+
+// Clear all sessions
+thinkingService.clearAll(agent);
+```
 
 ### ThinkingState
 
@@ -115,10 +137,37 @@ const state = agent.getState(ThinkingState);
 |--------|------------|---------|-------------|
 | `constructor` | `data: Partial<ThinkingState>` | `void` | Create new state instance with optional initial data |
 | `transferStateFromParent` | `parent: Agent` | `void` | Transfer state from parent agent |
-| `reset` | `what?: ResetWhat[]` | `void` | Reset state (clears all sessions when called) |
-| `serialize` | - | `z.output<typeof serializationSchema>` | Returns serialized state object |
+| `reset` | `void` | `void` | Reset state (clears all sessions) |
+| `serialize` | `void` | `z.output<typeof serializationSchema>` | Returns serialized state object |
 | `deserialize` | `data: z.output<typeof serializationSchema>` | `void` | Load state from serialized data |
-| `show` | - | `string[]` | Returns session summary array |
+| `show` | `void` | `string[]` | Returns session summary array |
+
+**Usage Example:**
+
+```typescript
+// Get current state
+const state = agent.getState(ThinkingState);
+
+// Show active sessions
+console.log(state.show());
+// Output:
+// Active Sessions: 1
+//   scientific-method-reasoning: 3 steps, in progress
+
+// Serialize state
+const serialized = state.serialize();
+// { sessions: { 'scientific-method-reasoning': {...}, ... } }
+
+// Deserialize state
+const newState = new ThinkingState(serialized);
+
+// Reset state (clears all sessions)
+state.reset();
+
+// Transfer state from parent agent
+const childState = new ThinkingState();
+childState.transferStateFromParent(parentAgent);
+```
 
 ### ReasoningSession
 
@@ -153,37 +202,16 @@ interface ReasoningSession {
 A strictly disciplined reasoning tool that enforces exact adherence to the scientific method. The tool maintains persistent state anchored to a single, fixed problem/question. Every contribution must explicitly advance one of the core steps of the scientific method.
 
 **Description:**
-```
-A strictly disciplined reasoning tool that enforces exact adherence to the scientific method.
 
-The tool maintains persistent state anchored to a single, fixed problem/question. Every contribution must explicitly advance one of the core steps of the scientific method. No free-form thoughts, confidence scores, summaries, or extraneous features are permitted—only direct contributions to the defined steps.
-
-Core scientific method steps enforced:
-1. Question/Observation: Clearly state the problem and relevant observations.
-2. Background Research: Gather and restate existing knowledge, constraints, or facts.
-3. Hypothesis: Formulate testable hypotheses (one or more; each must be falsifiable).
-4. Prediction: State specific, testable predictions derived from a hypothesis.
-5. Testing/Experimentation: Perform tests (deductive reasoning, calculations, counterexamples, or external verification) to gather evidence.
-6. Analysis: Interpret evidence objectively—does it support, refute, or require refinement of the hypothesis?
-7. Conclusion: Draw evidence-based conclusion; if unresolved, iterate by revising earlier steps.
-
-The process is iterative and self-correcting. Continue until a hypothesis is conclusively supported or refuted, or the question is fully answered.
-
-Rules:
-- First call must define the problem and begin with step 1 or 2.
-- Every subsequent call must specify exactly one step and contribute only to it.
-- Hypotheses are tracked explicitly; testing and analysis must reference them.
-- Only set nextThoughtNeeded: false when a final, evidence-based conclusion is reached.
-- Ignore all irrelevant information.
-- Final answer must directly follow from the completed scientific process.
-```
+A strictly disciplined reasoning tool that enforces exact adherence to the scientific method. The tool maintains persistent state anchored to a single, fixed problem/question. Every contribution must explicitly advance one of the core steps of the scientific method. No free-form thoughts, confidence scores, summaries, or extraneous features are permitted—only direct contributions to the defined steps.
 
 **Core Steps:**
+
 1. `question_observation` - Clearly state the problem and relevant observations
 2. `background_research` - Gather and restate existing knowledge, constraints, or facts
 3. `hypothesis_formulation` - Formulate testable hypotheses (one or more; each must be falsifiable)
 4. `prediction` - State specific, testable predictions derived from a hypothesis
-5. `testing_experimentation` - Perform tests to gather evidence
+5. `testing_experimentation` - Perform tests (deductive reasoning, calculations, counterexamples, or external verification) to gather evidence
 6. `analysis` - Interpret evidence objectively—does it support, refute, or require refinement of the hypothesis?
 7. `conclusion` - Draw evidence-based conclusion; if unresolved, iterate by revising earlier steps
 
@@ -256,14 +284,8 @@ const result4 = await agent.executeTool('scientific-method-reasoning', {
 
 Questions assumptions through structured inquiry.
 
-**Description:**
-```
-Socratic dialogue tool for questioning assumptions through structured inquiry.
-
-Steps: Question formulation → Assumption identification → Challenge assumption → Explore contradiction → Refine understanding → Synthesis
-```
-
 **Steps:**
+
 1. `question_formulation` - Formulate the initial question
 2. `assumption_identification` - Identify underlying assumptions
 3. `challenge_assumption` - Challenge identified assumptions
@@ -309,14 +331,8 @@ await agent.executeTool('socratic-dialogue', {
 
 Human-centered design process.
 
-**Description:**
-```
-Design thinking tool for human-centered problem solving.
-
-Steps: Empathize → Define problem → Ideate → Prototype → Test → Iterate
-```
-
 **Steps:**
+
 1. `empathize` - Understand user needs and perspectives
 2. `define` - Define the problem clearly
 3. `ideate` - Generate creative solutions
@@ -362,14 +378,8 @@ await agent.executeTool('design-thinking', {
 
 5 Whys methodology for finding fundamental causes.
 
-**Description:**
-```
-Root cause analysis (5 Whys) tool for drilling down to fundamental causes.
-
-Steps: State problem → Ask why → Record answer → Ask why again (repeat 5x) → Identify root cause → Propose solution
-```
-
 **Steps:**
+
 1. `state_problem` - Clearly state the problem
 2. `ask_why` - Ask why the problem occurs
 3. `identify_root_cause` - Identify the fundamental root cause
@@ -413,14 +423,8 @@ await agent.executeTool('root-cause-analysis', {
 
 Strategic planning through strengths, weaknesses, opportunities, threats.
 
-**Description:**
-```
-SWOT analysis tool for structured strategic planning.
-
-Steps: Define objective → Identify strengths → Identify weaknesses → Identify opportunities → Identify threats → Synthesize strategy
-```
-
 **Steps:**
+
 1. `define_objective` - Define the objective or goal to analyze
 2. `strengths` - Identify internal strengths
 3. `weaknesses` - Identify internal weaknesses
@@ -466,14 +470,8 @@ await agent.executeTool('swot-analysis', {
 
 Imagines failure to prevent it.
 
-**Description:**
-```
-Pre-mortem analysis tool for imagining failure to prevent it.
-
-Steps: Define goal → Assume failure → List reasons for failure → Assess likelihood → Develop mitigations → Revise plan
-```
-
 **Steps:**
+
 1. `define_goal` - Define the goal or plan to analyze
 2. `assume_failure` - Assume the plan has failed
 3. `list_failure_reasons` - List reasons for the failure
@@ -523,14 +521,8 @@ await agent.executeTool('pre-mortem', {
 
 Considers opposing views.
 
-**Description:**
-```
-Dialectical reasoning tool for considering opposing views.
-
-Steps: State thesis → Develop antithesis → Identify contradictions → Find common ground → Synthesize higher understanding
-```
-
 **Steps:**
+
 1. `state_thesis` - State the initial position or thesis
 2. `develop_antithesis` - Develop the opposing position
 3. `identify_contradictions` - Identify contradictions between thesis and antithesis
@@ -575,14 +567,8 @@ await agent.executeTool('dialectical-reasoning', {
 
 Breaks down to fundamental truths.
 
-**Description:**
-```
-First principles thinking tool for breaking down to fundamental truths.
-
-Steps: State problem → Identify assumptions → Challenge assumptions → Break to fundamental truths → Rebuild from basics → Novel solution
-```
-
 **Steps:**
+
 1. `state_problem` - State the problem to solve
 2. `identify_assumptions` - Identify assumptions about the problem
 3. `challenge_assumptions` - Challenge each assumption
@@ -628,14 +614,8 @@ await agent.executeTool('first-principles', {
 
 Structured multi-criteria decision making.
 
-**Description:**
-```
-Decision matrix tool for structured multi-criteria decision making.
-
-Steps: Define decision → List options → Define criteria → Weight criteria → Score each option → Calculate totals → Decide
-```
-
 **Steps:**
+
 1. `define_decision` - Define the decision to be made
 2. `list_options` - List available options
 3. `define_criteria` - Define evaluation criteria
@@ -694,14 +674,8 @@ await agent.executeTool('decision-matrix', {
 
 Creative problem reframing.
 
-**Description:**
-```
-Lateral thinking tool for creative problem reframing.
-
-Steps: State problem → Generate random stimulus → Force connection → Explore tangent → Extract insight → Apply to original problem
-```
-
 **Steps:**
+
 1. `state_problem` - State the problem
 2. `generate_stimulus` - Generate random stimulus
 3. `force_connection` - Force connection between stimulus and problem
@@ -747,14 +721,8 @@ await agent.executeTool('lateral-thinking', {
 
 Iterative development planning.
 
-**Description:**
-```
-Agile sprint planning tool for iterative development.
-
-Steps: Define goal → Break into stories → Estimate effort → Prioritize → Plan sprint → Execute → Review → Retrospect
-```
-
 **Steps:**
+
 1. `define_goal` - Define the sprint goal
 2. `break_into_stories` - Break goal into user stories
 3. `estimate_effort` - Estimate effort for each story
@@ -805,14 +773,8 @@ await agent.executeTool('agile-sprint', {
 
 Learning through explanation.
 
-**Description:**
-```
-Feynman technique for learning through explanation.
-
-Steps: Choose concept → Explain simply → Identify gaps → Review source → Simplify further → Use analogies
-```
-
 **Steps:**
+
 1. `choose_concept` - Choose the concept to understand
 2. `explain_simply` - Explain it simply
 3. `identify_gaps` - Identify gaps in understanding
@@ -858,14 +820,8 @@ await agent.executeTool('feynman-technique', {
 
 Parallel thinking from different perspectives.
 
-**Description:**
-```
-Six thinking hats tool for parallel thinking from different perspectives.
-
-Hats: White (facts) → Red (emotions) → Black (risks) → Yellow (benefits) → Green (creativity) → Blue (process)
-```
-
 **Hats:**
+
 - `white` - Facts and information
 - `red` - Emotions and feelings
 - `black` - Risks and caution
@@ -874,6 +830,7 @@ Hats: White (facts) → Red (emotions) → Black (risks) → Yellow (benefits) �
 - `blue` - Process and control
 
 **Steps:**
+
 1. `think` - Think from the perspective of a specific hat
 2. `synthesize` - Synthesize all perspectives
 
@@ -923,13 +880,16 @@ await agent.executeTool('six-thinking-hats', {
 
 ## Integration with TokenRing
 
-The package automatically integrates with the Token Ring application through the plugin system:
+The package automatically integrates with the Token Ring application through the plugin system.
+
+### Plugin Registration
 
 ```typescript
-// Automatically registered in plugin.ts
 import thinkingPlugin from "@tokenring-ai/thinking/plugin";
 
-// No manual registration needed - the plugin handles it automatically
+// The plugin automatically:
+// 1. Registers ThinkingService with the application
+// 2. Registers all 13 tools with the ChatService
 ```
 
 ### Service Registration
@@ -954,7 +914,7 @@ await agent.executeTool('first-principles', {...});
 
 ## State Management
 
-Each reasoning tool maintains its own session state that persists across multiple calls:
+Each reasoning tool maintains its own session state that persists across multiple calls.
 
 ```typescript
 // First call - initializes session
@@ -1026,7 +986,7 @@ state.reset();
 
 No additional configuration required. The package uses sensible defaults and automatically integrates with the Token Ring framework.
 
-## Integration Examples
+## Usage Examples
 
 ### Basic Usage with an Agent
 
@@ -1074,7 +1034,7 @@ thinkingService.clearSession('scientific-method-reasoning', agent);
 thinkingService.clearAll(agent);
 ```
 
-### Custom Tool Integration
+### Using Multiple Thinking Tools
 
 ```typescript
 // Use different thinking tools for different scenarios
@@ -1091,26 +1051,37 @@ await agent.executeTool('pre-mortem', {
   content: "Production outage during weekend support gap",
   nextThoughtNeeded: true
 });
+
+await agent.executeTool('swot-analysis', {
+  problem: "Launch new product line",
+  step: "strengths",
+  content: "Strong brand recognition and customer loyalty",
+  nextThoughtNeeded: true
+});
 ```
 
 ## Development
 
 ### Building
+
 ```bash
 bun run build
 ```
 
 ### Testing
+
 ```bash
 bun run test
 ```
 
 ### Watch Tests
+
 ```bash
 bun run test:watch
 ```
 
 ### Coverage
+
 ```bash
 bun run test:coverage
 ```
@@ -1141,7 +1112,7 @@ class ThinkingState implements AgentStateSlice<typeof serializationSchema> {
 
   constructor(data: Partial<ThinkingState> = {});
   transferStateFromParent(parent: Agent): void;
-  reset(what?: ResetWhat[]): void;
+  reset(): void;
   serialize(): z.output<typeof serializationSchema>;
   deserialize(data: z.output<typeof serializationSchema>): void;
   show(): string[];
@@ -1161,9 +1132,7 @@ interface ReasoningSession {
 }
 ```
 
-## Tool Schema Details
-
-### Input Schema Pattern
+## Tool Schema Pattern
 
 All tools follow a consistent input schema pattern:
 
@@ -1199,7 +1168,7 @@ await agent.executeTool('first-principles', {
 
 ### Development Dependencies
 
-- `vitest` (^4.0.18) - Testing framework
+- `vitest` (^4.1.0) - Testing framework
 - `typescript` (^5.9.3) - TypeScript compiler
 
 ## License
