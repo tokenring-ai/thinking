@@ -1,38 +1,6 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 import scientificMethod from "../tools/scientificMethod";
 
-vi.mock("zod", () => {
-  const createDescribableSchema = () => ({
-    describe: vi.fn().mockReturnValue({
-      optional: () => ({ describe: vi.fn().mockReturnValue({}) }),
-    }),
-    optional: () => ({ describe: vi.fn().mockReturnValue({}) }),
-  });
-
-  return {
-    z: {
-      object: vi.fn().mockReturnValue({
-        parse: vi.fn(),
-        describe: vi.fn().mockReturnValue(createDescribableSchema()),
-        optional: vi.fn().mockReturnValue({ describe: vi.fn().mockReturnValue({}) }),
-        shape: {
-          problem: { _def: { type: "void" } },
-          step: { _def: { type: "enum", values: ["question_observation", "background_research", "hypothesis_formulation", "prediction", "testing_experimentation", "analysis", "conclusion"] } },
-          content: { _def: { type: "void" } },
-          targets_hypothesis_id: { _def: { type: "void" } },
-          hypothesis_update: { _def: { type: "void" } },
-          nextThoughtNeeded: { _def: { type: "boolean" } },
-          final_answer: { _def: { type: "void" } },
-        },
-      }),
-      string: () => createDescribableSchema(),
-      array: vi.fn().mockReturnValue(createDescribableSchema()),
-      boolean: () => createDescribableSchema(),
-      enum: vi.fn().mockReturnValue(createDescribableSchema()),
-    },
-  };
-});
-
 // Mock Agent module
 vi.mock("@tokenring-ai/agent/Agent", () => ({ default: {} }));
 vi.mock("@tokenring-ai/chat/types", () => ({ TokenRingToolDefinition: {} }));

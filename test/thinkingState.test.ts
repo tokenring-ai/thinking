@@ -16,16 +16,16 @@ describe("ThinkingState", () => {
 
     it("should initialize with provided data", () => {
       const data = {
-        sessions: {
-          "tool1": {
+        sessions: new Map([
+          ["tool1", {
             tool: "tool1",
             problem: "Problem 1",
             stepNumber: 1,
             data: {},
             completedSteps: [],
             complete: false
-          }
-        }
+          }]
+        ])
       };
 
       const stateWithData = new ThinkingState(data);
@@ -110,7 +110,7 @@ describe("ThinkingState", () => {
     });
 
     it("should handle empty data", () => {
-      const data = { sessions: null };
+      const data = { sessions: {} };
 
       state.deserialize(data);
 
@@ -136,29 +136,28 @@ describe("ThinkingState", () => {
   });
 
   describe("reset", () => {
-    it("should clear sessions when 'chat' is included", () => {
+    it("should clear all sessions", () => {
       state.sessions.set("tool1", {} as ReasoningSession);
       state.sessions.set("tool2", {} as ReasoningSession);
 
-      state.reset(["chat"]);
+      state.reset();
 
       expect(state.sessions.size).toBe(0);
     });
 
-    it("should not clear sessions when 'chat' is not included", () => {
+    it("should clear all sessions when called multiple times", () => {
       state.sessions.set("tool1", {} as ReasoningSession);
+      
+      state.reset();
+      state.reset();
 
-      state.reset(["other"]);
-
-      expect(state.sessions.size).toBe(1);
+      expect(state.sessions.size).toBe(0);
     });
 
-    it("should handle empty reset list", () => {
-      state.sessions.set("tool1", {} as ReasoningSession);
+    it("should handle empty state", () => {
+      state.reset();
 
-      state.reset([]);
-
-      expect(state.sessions.size).toBe(1);
+      expect(state.sessions.size).toBe(0);
     });
   });
 
