@@ -27,6 +27,7 @@ async function execute(
       if (update.hypothesis_id) {
         const hyp = session.data.hypotheses.find((h: any) => h.id === update.hypothesis_id);
         if (hyp) {
+          hyp.linkedThoughts ??= [];
           hyp.linkedThoughts.push(session.stepNumber);
           if (update.new_hypothesis_text) hyp.text = update.new_hypothesis_text;
           if (update.action === "refute") hyp.status = "refuted";

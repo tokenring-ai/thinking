@@ -22,7 +22,7 @@ The `@tokenring-ai/thinking` package provides a comprehensive suite of 13 struct
 ## Installation
 
 ```bash
-bun install @tokenring-ai/thinking
+bun add @tokenring-ai/thinking
 ```
 
 The package automatically registers with the Token Ring application when included in your application's dependencies via the plugin system.
@@ -37,7 +37,7 @@ pkg/thinking/
 ├── tools.ts                    # Tool exports and registry
 ├── state/
 │   └── thinkingState.ts        # State management for sessions
-├── tools/                      # Individual tool implementations
+├── tools/                      # Individual tool implementations (13 tools)
 │   ├── scientificMethod.ts     # Scientific method reasoning
 │   ├── socraticDialogue.ts     # Socratic dialogue
 │   ├── designThinking.ts       # Design thinking
@@ -52,7 +52,14 @@ pkg/thinking/
 │   ├── feynmanTechnique.ts     # Feynman technique
 │   └── sixThinkingHats.ts      # Six thinking hats
 ├── test/                       # Test suite
-│   └── *.test.ts               # Test files
+│   ├── thinkingState.test.ts   # State management tests
+│   ├── scientificMethod.test.ts # Scientific method tests
+│   ├── integration.test.ts     # Integration tests
+│   ├── tools.test.ts           # General tool tests
+│   ├── decisionMatrix.test.ts  # Decision matrix tests
+│   ├── firstPrinciples.test.ts # First principles tests
+│   ├── thinkingService.test.ts # Service tests
+│   └── *.test.ts               # Additional test files
 └── vitest.config.ts            # Test configuration
 ```
 
@@ -1090,13 +1097,37 @@ bun run test:coverage
 
 ### ThinkingService
 
+Main service class that manages reasoning sessions and state persistence.
+
+```typescript
+import ThinkingService from "@tokenring-ai/thinking/ThinkingService";
+
+const thinkingService = new ThinkingService();
+```
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `name` | `string` | Service name ("ThinkingService") |
+| `description` | `string` | Service description ("Provides structured reasoning functionality") |
+
+**Methods:**
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `attach` | `agent: Agent` | `void` | Initializes ThinkingState for agent |
+| `processStep` | `toolName: string`, `args: any`, `agent: Agent`, `processor: (session: ReasoningSession, args: any) => any` | `ReasoningSession` | Processes step in reasoning session and returns updated session |
+| `clearSession` | `toolName: string`, `agent: Agent` | `void` | Clears specific tool session |
+| `clearAll` | `agent: Agent` | `void` | Clears all reasoning sessions |
+
 ```typescript
 class ThinkingService implements TokenRingService {
   readonly name = "ThinkingService";
-  readonly description = "Provides structured reasoning functionality";
+  description = "Provides structured reasoning functionality";
 
   attach(agent: Agent): void;
-  processStep(toolName: string, args: any, agent: Agent, processor: (session: ReasoningSession, args: any) => any): ReasoningSession;
+  processStep(toolName: string, args: any, agent: Agent, processor: (session: ReasoningSession, args: any) => any): any;
   clearSession(toolName: string, agent: Agent): void;
   clearAll(agent: Agent): void;
 }
@@ -1104,11 +1135,39 @@ class ThinkingService implements TokenRingService {
 
 ### ThinkingState
 
+Agent state slice that manages reasoning session persistence.
+
 ```typescript
-class ThinkingState implements AgentStateSlice<typeof serializationSchema> {
+import { ThinkingState } from "@tokenring-ai/thinking";
+
+// Automatically attached to agents by ThinkingService
+const state = agent.getState(ThinkingState);
+```
+
+**Properties:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `name` | `string` | State slice name ("ThinkingState") |
+| `serializationSchema` | `ZodSchema` | Zod schema for serialization |
+| `sessions` | `Map<string, ReasoningSession>` | Active reasoning sessions |
+
+**Methods:**
+
+| Method | Parameters | Returns | Description |
+|--------|------------|---------|-------------|
+| `constructor` | `data: Partial<ThinkingState>` | `void` | Create new state instance with optional initial data |
+| `transferStateFromParent` | `parent: Agent` | `void` | Transfer state from parent agent |
+| `reset` | `void` | `void` | Reset state (clears all sessions) |
+| `serialize` | `void` | `z.output<typeof serializationSchema>` | Returns serialized state object |
+| `deserialize` | `data: z.output<typeof serializationSchema>` | `void` | Load state from serialized data |
+| `show` | `void` | `string[]` | Returns session summary array |
+
+```typescript
+class ThinkingState extends AgentStateSlice<typeof serializationSchema> {
   readonly name = "ThinkingState";
   readonly serializationSchema = serializationSchema;
-  sessions: Map<string, ReasoningSession>;
+  sessions: Map<string, ReasoningSession> = new Map();
 
   constructor(data: Partial<ThinkingState> = {});
   transferStateFromParent(parent: Agent): void;
@@ -1168,8 +1227,8 @@ await agent.executeTool('first-principles', {
 
 ### Development Dependencies
 
-- `vitest` (^4.1.0) - Testing framework
-- `typescript` (^5.9.3) - TypeScript compiler
+- `vitest` (^4.1.1) - Testing framework
+- `typescript` (^6.0.2) - TypeScript compiler
 
 ## License
 
