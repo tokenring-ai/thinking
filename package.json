@@ -1,7 +1,7 @@
 {
   "name": "@tokenring-ai/thinking",
   "version": "0.2.0",
-  "description": "Structured reasoning service with 13 specialized thinking tools for disciplined problem-solving",
+  "description": "Structured problem-solving framework using specialized \"thinking tools\" for complex logic.",
   "dependencies": {
     "@tokenring-ai/app": "0.2.0",
     "@tokenring-ai/chat": "0.2.0",
