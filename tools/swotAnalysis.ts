@@ -1,12 +1,15 @@
-import Agent from "@tokenring-ai/agent/Agent";
-import {TokenRingToolDefinition, type TokenRingToolJSONResult} from "@tokenring-ai/chat/schema";
+import type Agent from "@tokenring-ai/agent/Agent";
+import type {TokenRingToolDefinition, TokenRingToolJSONResult,} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "swot-analysis";
 const displayName = "Thinking/swotAnalysis";
 
-async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promise<TokenRingToolJSONResult<any>> {
+function execute(
+  args: z.output<typeof inputSchema>,
+  agent: Agent,
+): TokenRingToolJSONResult<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.strengths) session.data.strengths = [];
@@ -16,9 +19,11 @@ async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promis
 
     if (args.step === "strengths") session.data.strengths.push(args.content);
     if (args.step === "weaknesses") session.data.weaknesses.push(args.content);
-    if (args.step === "opportunities") session.data.opportunities.push(args.content);
+    if (args.step === "opportunities")
+      session.data.opportunities.push(args.content);
     if (args.step === "threats") session.data.threats.push(args.content);
-    if (args.step === "synthesize_strategy") session.data.strategy = args.content;
+    if (args.step === "synthesize_strategy")
+      session.data.strategy = args.content;
 
     return {
       type: "json",
@@ -33,7 +38,7 @@ async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promis
         strategy: session.data.strategy,
         completedSteps: session.completedSteps,
         complete: session.complete,
-      }
+      },
     };
   });
 }
@@ -44,9 +49,22 @@ Steps: Define objective → Identify strengths → Identify weaknesses → Ident
 
 const inputSchema = z.object({
   problem: z.string().optional().describe("The objective or goal to analyze"),
-  step: z.enum(["define_objective", "strengths", "weaknesses", "opportunities", "threats", "synthesize_strategy"]),
+  step: z.enum([
+    "define_objective",
+    "strengths",
+    "weaknesses",
+    "opportunities",
+    "threats",
+    "synthesize_strategy",
+  ]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
 });
 
-export default { name, displayName, description, inputSchema, execute } satisfies TokenRingToolDefinition<typeof inputSchema>;
+export default {
+  name,
+  displayName,
+  description,
+  inputSchema,
+  execute,
+} satisfies TokenRingToolDefinition<typeof inputSchema>;

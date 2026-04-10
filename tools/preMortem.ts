@@ -1,12 +1,15 @@
-import Agent from "@tokenring-ai/agent/Agent";
-import {TokenRingToolDefinition, type TokenRingToolJSONResult} from "@tokenring-ai/chat/schema";
+import type Agent from "@tokenring-ai/agent/Agent";
+import type {TokenRingToolDefinition, TokenRingToolJSONResult,} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "pre-mortem";
 const displayName = "Thinking/preMortem";
 
-async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promise<TokenRingToolJSONResult<any>> {
+function execute(
+  args: z.output<typeof inputSchema>,
+  agent: Agent,
+): TokenRingToolJSONResult<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.failureScenarios) session.data.failureScenarios = [];
@@ -39,7 +42,7 @@ async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promis
         revisedPlan: session.data.revisedPlan,
         completedSteps: session.completedSteps,
         complete: session.complete,
-      }
+      },
     };
   });
 }
@@ -50,11 +53,24 @@ Steps: Define goal → Assume failure → List reasons for failure → Assess li
 
 const inputSchema = z.object({
   problem: z.string().optional().describe("The goal or plan to analyze"),
-  step: z.enum(["define_goal", "assume_failure", "list_failure_reasons", "assess_likelihood", "develop_mitigations", "revise_plan"]),
+  step: z.enum([
+    "define_goal",
+    "assume_failure",
+    "list_failure_reasons",
+    "assess_likelihood",
+    "develop_mitigations",
+    "revise_plan",
+  ]),
   content: z.string(),
   likelihood: z.enum(["low", "medium", "high"]).optional(),
   targets_scenario: z.string().optional(),
   nextThoughtNeeded: z.boolean(),
 });
 
-export default { name, displayName, description, inputSchema, execute } satisfies TokenRingToolDefinition<typeof inputSchema>;
+export default {
+  name,
+  displayName,
+  description,
+  inputSchema,
+  execute,
+} satisfies TokenRingToolDefinition<typeof inputSchema>;

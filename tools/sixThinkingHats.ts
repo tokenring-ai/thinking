@@ -1,15 +1,26 @@
-import Agent from "@tokenring-ai/agent/Agent";
-import {TokenRingToolDefinition, type TokenRingToolJSONResult} from "@tokenring-ai/chat/schema";
+import type Agent from "@tokenring-ai/agent/Agent";
+import type {TokenRingToolDefinition, TokenRingToolJSONResult,} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "six-thinking-hats";
 const displayName = "Thinking/sixThinkingHats";
 
-async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promise<TokenRingToolJSONResult<any>> {
+function execute(
+  args: z.output<typeof inputSchema>,
+  agent: Agent,
+): TokenRingToolJSONResult<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
-    if (!session.data.hats) session.data.hats = {white: [], red: [], black: [], yellow: [], green: [], blue: []};
+    if (!session.data.hats)
+      session.data.hats = {
+        white: [],
+        red: [],
+        black: [],
+        yellow: [],
+        green: [],
+        blue: [],
+      };
 
     if (args.hat) {
       session.data.hats[args.hat].push(args.content);
@@ -27,7 +38,7 @@ async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promis
         synthesis: session.data.synthesis,
         completedSteps: session.completedSteps,
         complete: session.complete,
-      }
+      },
     };
   });
 }
@@ -44,4 +55,10 @@ const inputSchema = z.object({
   nextThoughtNeeded: z.boolean(),
 });
 
-export default { name, displayName, description, inputSchema, execute } satisfies TokenRingToolDefinition<typeof inputSchema>;
+export default {
+  name,
+  displayName,
+  description,
+  inputSchema,
+  execute,
+} satisfies TokenRingToolDefinition<typeof inputSchema>;

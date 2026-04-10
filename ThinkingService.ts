@@ -1,5 +1,5 @@
-import Agent from "@tokenring-ai/agent/Agent";
-import {TokenRingService} from "@tokenring-ai/app/types";
+import type Agent from "@tokenring-ai/agent/Agent";
+import type {TokenRingService} from "@tokenring-ai/app/types";
 import {type ReasoningSession, ThinkingState} from "./state/thinkingState.ts";
 
 export default class ThinkingService implements TokenRingService {
@@ -10,7 +10,12 @@ export default class ThinkingService implements TokenRingService {
     agent.initializeState(ThinkingState, {});
   }
 
-  processStep(toolName: string, args: any, agent: Agent, processor: (session: ReasoningSession, args: any) => any): any {
+  processStep(
+    toolName: string,
+    args: any,
+    agent: Agent,
+    processor: (session: ReasoningSession, args: any) => any,
+  ): any {
     const state = agent.getState(ThinkingState);
     let session = state.sessions.get(toolName);
 
@@ -29,13 +34,14 @@ export default class ThinkingService implements TokenRingService {
     }
 
     agent.mutateState(ThinkingState, (s: ThinkingState) => {
-      session!.stepNumber++;
-      if (args.step && !session!.completedSteps.includes(args.step)) {
-        session!.completedSteps.push(args.step);
+      session.stepNumber++;
+      if (args.step && !session.completedSteps.includes(args.step)) {
+        session.completedSteps.push(args.step);
       }
-      const result = processor(session!, args);
-      session!.complete = args.nextThoughtNeeded === false || args.complete === true;
-      s.sessions.set(toolName, session!);
+      const result = processor(session, args);
+      session.complete =
+        args.nextThoughtNeeded === false || args.complete === true;
+      s.sessions.set(toolName, session);
       return result;
     });
 

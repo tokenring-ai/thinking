@@ -1,12 +1,15 @@
-import Agent from "@tokenring-ai/agent/Agent";
-import {TokenRingToolDefinition, type TokenRingToolJSONResult} from "@tokenring-ai/chat/schema";
+import type Agent from "@tokenring-ai/agent/Agent";
+import type {TokenRingToolDefinition, TokenRingToolJSONResult,} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "design-thinking";
 const displayName = "Thinking/designThinking";
 
-async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promise<TokenRingToolJSONResult<any>> {
+function execute(
+  args: z.output<typeof inputSchema>,
+  agent: Agent,
+): TokenRingToolJSONResult<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.userNeeds) session.data.userNeeds = [];
@@ -31,7 +34,7 @@ async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promis
         testResults: session.data.testResults,
         completedSteps: session.completedSteps,
         complete: session.complete,
-      }
+      },
     };
   });
 }
@@ -42,9 +45,22 @@ Steps: Empathize → Define problem → Ideate → Prototype → Test → Iterat
 
 const inputSchema = z.object({
   problem: z.string().optional(),
-  step: z.enum(["empathize", "define", "ideate", "prototype", "test", "iterate"]),
+  step: z.enum([
+    "empathize",
+    "define",
+    "ideate",
+    "prototype",
+    "test",
+    "iterate",
+  ]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
 });
 
-export default { name, displayName, description, inputSchema, execute } satisfies TokenRingToolDefinition<typeof inputSchema>;
+export default {
+  name,
+  displayName,
+  description,
+  inputSchema,
+  execute,
+} satisfies TokenRingToolDefinition<typeof inputSchema>;

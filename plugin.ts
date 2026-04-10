@@ -1,4 +1,4 @@
-import {TokenRingPlugin} from "@tokenring-ai/app";
+import type {TokenRingPlugin} from "@tokenring-ai/app";
 import {ChatService} from "@tokenring-ai/chat";
 import {z} from "zod";
 
@@ -8,17 +8,16 @@ import tools from "./tools.ts";
 
 const packageConfigSchema = z.object({});
 
-
 export default {
   name: packageJSON.name,
   displayName: "Scientific Reasoning",
   version: packageJSON.version,
   description: packageJSON.description,
-  install(app, config) {
-    app.waitForService(ChatService, chatService => {
+  install(app, _config) {
+    app.waitForService(ChatService, (chatService) => {
       chatService.addTools(tools);
     });
     app.addServices(new ThinkingService());
   },
-  config: packageConfigSchema
+  config: packageConfigSchema,
 } satisfies TokenRingPlugin<typeof packageConfigSchema>;

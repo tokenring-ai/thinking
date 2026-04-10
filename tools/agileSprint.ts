@@ -1,12 +1,15 @@
-import Agent from "@tokenring-ai/agent/Agent";
-import {TokenRingToolDefinition, type TokenRingToolJSONResult} from "@tokenring-ai/chat/schema";
+import type Agent from "@tokenring-ai/agent/Agent";
+import type {TokenRingToolDefinition, TokenRingToolJSONResult,} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "agile-sprint";
 const displayName = "Thinking/agileSprint";
 
-async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promise<TokenRingToolJSONResult<any>> {
+function execute(
+  args: z.output<typeof inputSchema>,
+  agent: Agent,
+): TokenRingToolJSONResult<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.backlog) session.data.backlog = [];
@@ -14,10 +17,16 @@ async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promis
     if (!session.data.completed) session.data.completed = [];
     if (!session.data.retrospectives) session.data.retrospectives = [];
 
-    if (args.step === "break_into_stories") session.data.backlog.push({story: args.content, estimate: args.estimate});
-    if (args.step === "plan_sprint") session.data.currentSprint.push(args.content);
+    if (args.step === "break_into_stories")
+      session.data.backlog.push({
+        story: args.content,
+        estimate: args.estimate,
+      });
+    if (args.step === "plan_sprint")
+      session.data.currentSprint.push(args.content);
     if (args.step === "execute") session.data.completed.push(args.content);
-    if (args.step === "retrospect") session.data.retrospectives.push(args.content);
+    if (args.step === "retrospect")
+      session.data.retrospectives.push(args.content);
 
     return {
       type: "json",
@@ -31,7 +40,7 @@ async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promis
         retrospectives: session.data.retrospectives,
         completedSteps: session.completedSteps,
         complete: session.complete,
-      }
+      },
     };
   });
 }
@@ -42,10 +51,25 @@ Steps: Define goal → Break into stories → Estimate effort → Prioritize →
 
 const inputSchema = z.object({
   problem: z.string().optional(),
-  step: z.enum(["define_goal", "break_into_stories", "estimate_effort", "prioritize", "plan_sprint", "execute", "review", "retrospect"]),
+  step: z.enum([
+    "define_goal",
+    "break_into_stories",
+    "estimate_effort",
+    "prioritize",
+    "plan_sprint",
+    "execute",
+    "review",
+    "retrospect",
+  ]),
   content: z.string(),
   estimate: z.number().optional(),
   nextThoughtNeeded: z.boolean(),
 });
 
-export default { name, displayName, description, inputSchema, execute } satisfies TokenRingToolDefinition<typeof inputSchema>;
+export default {
+  name,
+  displayName,
+  description,
+  inputSchema,
+  execute,
+} satisfies TokenRingToolDefinition<typeof inputSchema>;

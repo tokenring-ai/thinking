@@ -1,23 +1,35 @@
-import Agent from "@tokenring-ai/agent/Agent";
-import {TokenRingToolDefinition, type TokenRingToolJSONResult} from "@tokenring-ai/chat/schema";
+import type Agent from "@tokenring-ai/agent/Agent";
+import type {TokenRingToolDefinition, TokenRingToolJSONResult,} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "socratic-dialogue";
 const displayName = "Thinking/socraticDialogue";
 
-async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promise<TokenRingToolJSONResult<any>> {
+function execute(
+  args: z.output<typeof inputSchema>,
+  agent: Agent,
+): TokenRingToolJSONResult<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.questions) session.data.questions = [];
     if (!session.data.assumptions) session.data.assumptions = [];
     if (!session.data.contradictions) session.data.contradictions = [];
 
-    if (args.step === "question_formulation" || args.step === "challenge_assumption") {
-      session.data.questions.push({step: session.stepNumber, content: args.content});
+    if (
+      args.step === "question_formulation" ||
+      args.step === "challenge_assumption"
+    ) {
+      session.data.questions.push({
+        step: session.stepNumber,
+        content: args.content,
+      });
     }
     if (args.step === "assumption_identification") {
-      session.data.assumptions.push({id: `a${session.data.assumptions.length + 1}`, text: args.content});
+      session.data.assumptions.push({
+        id: `a${session.data.assumptions.length + 1}`,
+        text: args.content,
+      });
     }
     if (args.step === "explore_contradiction") {
       session.data.contradictions.push(args.content);
@@ -34,7 +46,7 @@ async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promis
         contradictions: session.data.contradictions,
         completedSteps: session.completedSteps,
         complete: session.complete,
-      }
+      },
     };
   });
 }
@@ -45,9 +57,22 @@ Steps: Question formulation → Assumption identification → Challenge assumpti
 
 const inputSchema = z.object({
   problem: z.string().optional(),
-  step: z.enum(["question_formulation", "assumption_identification", "challenge_assumption", "explore_contradiction", "refine_understanding", "synthesis"]),
+  step: z.enum([
+    "question_formulation",
+    "assumption_identification",
+    "challenge_assumption",
+    "explore_contradiction",
+    "refine_understanding",
+    "synthesis",
+  ]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
 });
 
-export default { name, displayName, description, inputSchema, execute } satisfies TokenRingToolDefinition<typeof inputSchema>;
+export default {
+  name,
+  displayName,
+  description,
+  inputSchema,
+  execute,
+} satisfies TokenRingToolDefinition<typeof inputSchema>;

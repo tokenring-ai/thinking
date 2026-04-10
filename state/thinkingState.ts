@@ -1,5 +1,6 @@
-import {Agent} from "@tokenring-ai/agent";
+import type {Agent} from "@tokenring-ai/agent";
 import {AgentStateSlice} from "@tokenring-ai/agent/types";
+import markdownList from "@tokenring-ai/utility/string/markdownList";
 import {z} from "zod";
 
 export interface ReasoningSession {
@@ -12,7 +13,7 @@ export interface ReasoningSession {
 }
 
 const serializationSchema = z.object({
-  sessions: z.any()
+  sessions: z.any(),
 });
 
 export class ThinkingState extends AgentStateSlice<typeof serializationSchema> {
@@ -30,9 +31,8 @@ export class ThinkingState extends AgentStateSlice<typeof serializationSchema> {
     this.deserialize(parentState.serialize());
   }
 
-
   reset(): void {
-          this.sessions.clear();
+    this.sessions.clear();
   }
 
   serialize(): z.output<typeof serializationSchema> {
@@ -42,15 +42,15 @@ export class ThinkingState extends AgentStateSlice<typeof serializationSchema> {
   }
 
   deserialize(data: z.output<typeof serializationSchema>): void {
-    this.sessions = data.sessions ? new Map(Object.entries(data.sessions)) : new Map();
+    this.sessions = data.sessions
+      ? new Map(Object.entries(data.sessions))
+      : new Map();
   }
 
-  show(): string[] {
-    return [
-      `Active Sessions: ${this.sessions.size}`,
-      ...Array.from(this.sessions.entries()).map(([tool, s]) =>
-        `  ${tool}: ${s.stepNumber} steps, ${s.complete ? "complete" : "in progress"}`
-      )
-    ];
+  show(): string {
+    return `Active Sessions: ${this.sessions.size}
+${markdownList(Array.from(this.sessions.entries()).map(
+      ([tool, s]) => `${tool}: ${s.stepNumber} steps, ${s.complete ? "complete" : "in progress"}`,
+    ))}`;
   }
 }

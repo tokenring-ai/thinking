@@ -1,21 +1,26 @@
-import Agent from "@tokenring-ai/agent/Agent";
-import {TokenRingToolDefinition, type TokenRingToolJSONResult} from "@tokenring-ai/chat/schema";
+import type Agent from "@tokenring-ai/agent/Agent";
+import type {TokenRingToolDefinition, TokenRingToolJSONResult,} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "dialectical-reasoning";
 const displayName = "Thinking/dialecticalReasoning";
 
-async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promise<TokenRingToolJSONResult<any>> {
+function execute(
+  args: z.output<typeof inputSchema>,
+  agent: Agent,
+): TokenRingToolJSONResult<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (args.step === "state_thesis") session.data.thesis = args.content;
-    if (args.step === "develop_antithesis") session.data.antithesis = args.content;
+    if (args.step === "develop_antithesis")
+      session.data.antithesis = args.content;
     if (args.step === "identify_contradictions") {
       if (!session.data.contradictions) session.data.contradictions = [];
       session.data.contradictions.push(args.content);
     }
-    if (args.step === "find_common_ground") session.data.commonGround = args.content;
+    if (args.step === "find_common_ground")
+      session.data.commonGround = args.content;
     if (args.step === "synthesize") session.data.synthesis = args.content;
 
     return {
@@ -31,7 +36,7 @@ async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promis
         synthesis: session.data.synthesis,
         completedSteps: session.completedSteps,
         complete: session.complete,
-      }
+      },
     };
   });
 }
@@ -42,9 +47,21 @@ Steps: State thesis → Develop antithesis → Identify contradictions → Find 
 
 const inputSchema = z.object({
   problem: z.string().optional(),
-  step: z.enum(["state_thesis", "develop_antithesis", "identify_contradictions", "find_common_ground", "synthesize"]),
+  step: z.enum([
+    "state_thesis",
+    "develop_antithesis",
+    "identify_contradictions",
+    "find_common_ground",
+    "synthesize",
+  ]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
 });
 
-export default { name, displayName, description, inputSchema, execute } satisfies TokenRingToolDefinition<typeof inputSchema>;
+export default {
+  name,
+  displayName,
+  description,
+  inputSchema,
+  execute,
+} satisfies TokenRingToolDefinition<typeof inputSchema>;

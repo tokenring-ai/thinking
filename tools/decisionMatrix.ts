@@ -1,12 +1,15 @@
-import Agent from "@tokenring-ai/agent/Agent";
-import {TokenRingToolDefinition, type TokenRingToolJSONResult} from "@tokenring-ai/chat/schema";
+import type Agent from "@tokenring-ai/agent/Agent";
+import type {TokenRingToolDefinition, TokenRingToolJSONResult,} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "decision-matrix";
 const displayName = "Thinking/decisionMatrix";
 
-async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promise<TokenRingToolJSONResult<any>> {
+function execute(
+  args: z.output<typeof inputSchema>,
+  agent: Agent,
+): TokenRingToolJSONResult<any> {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.options) session.data.options = [];
@@ -15,13 +18,17 @@ async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promis
 
     if (args.step === "list_options") session.data.options.push(args.content);
     if (args.step === "define_criteria") {
-      session.data.criteria.push({name: args.content, weight: args.weight || 1});
+      session.data.criteria.push({
+        name: args.content,
+        weight: args.weight || 1,
+      });
     }
     if (args.step === "score_options" && args.option && args.criterion) {
       const key = `${args.option}:${args.criterion}`;
       session.data.scores[key] = args.score;
     }
-    if (args.step === "calculate_decide") session.data.recommendation = args.content;
+    if (args.step === "calculate_decide")
+      session.data.recommendation = args.content;
 
     return {
       type: "json",
@@ -35,7 +42,7 @@ async function execute(args: z.output<typeof inputSchema>, agent: Agent): Promis
         recommendation: session.data.recommendation,
         completedSteps: session.completedSteps,
         complete: session.complete,
-      }
+      },
     };
   });
 }
@@ -46,7 +53,14 @@ Steps: Define decision → List options → Define criteria → Weight criteria 
 
 const inputSchema = z.object({
   problem: z.string().optional(),
-  step: z.enum(["define_decision", "list_options", "define_criteria", "weight_criteria", "score_options", "calculate_decide"]),
+  step: z.enum([
+    "define_decision",
+    "list_options",
+    "define_criteria",
+    "weight_criteria",
+    "score_options",
+    "calculate_decide",
+  ]),
   content: z.string(),
   weight: z.number().optional(),
   option: z.string().optional(),
@@ -55,4 +69,10 @@ const inputSchema = z.object({
   nextThoughtNeeded: z.boolean(),
 });
 
-export default { name, displayName, description, inputSchema, execute } satisfies TokenRingToolDefinition<typeof inputSchema>;
+export default {
+  name,
+  displayName,
+  description,
+  inputSchema,
+  execute,
+} satisfies TokenRingToolDefinition<typeof inputSchema>;
