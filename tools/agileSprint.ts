@@ -1,5 +1,5 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition, TokenRingToolJSONResult,} from "@tokenring-ai/chat/schema";
+import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
@@ -9,7 +9,7 @@ const displayName = "Thinking/agileSprint";
 function execute(
   args: z.output<typeof inputSchema>,
   agent: Agent,
-): TokenRingToolJSONResult<any> {
+): TokenRingToolResult {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.backlog) session.data.backlog = [];
@@ -29,18 +29,15 @@ function execute(
       session.data.retrospectives.push(args.content);
 
     return {
-      type: "json",
-      data: {
-        stepNumber: session.stepNumber,
-        currentStep: args.step,
-        goal: session.problem,
-        backlog: session.data.backlog,
-        currentSprint: session.data.currentSprint,
-        completed: session.data.completed,
-        retrospectives: session.data.retrospectives,
-        completedSteps: session.completedSteps,
-        complete: session.complete,
-      },
+      stepNumber: session.stepNumber,
+      currentStep: args.step,
+      goal: session.problem,
+      backlog: session.data.backlog,
+      currentSprint: session.data.currentSprint,
+      completed: session.data.completed,
+      retrospectives: session.data.retrospectives,
+      completedSteps: session.completedSteps,
+      complete: session.complete,
     };
   });
 }

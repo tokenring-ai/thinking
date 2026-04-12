@@ -1,5 +1,5 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition, TokenRingToolJSONResult,} from "@tokenring-ai/chat/schema";
+import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
@@ -9,7 +9,7 @@ const displayName = "Thinking/sixThinkingHats";
 function execute(
   args: z.output<typeof inputSchema>,
   agent: Agent,
-): TokenRingToolJSONResult<any> {
+): TokenRingToolResult {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.hats)
@@ -28,17 +28,14 @@ function execute(
     if (args.step === "synthesize") session.data.synthesis = args.content;
 
     return {
-      type: "json",
-      data: {
-        stepNumber: session.stepNumber,
-        currentStep: args.step,
-        currentHat: args.hat,
-        problem: session.problem,
-        hats: session.data.hats,
-        synthesis: session.data.synthesis,
-        completedSteps: session.completedSteps,
-        complete: session.complete,
-      },
+      stepNumber: session.stepNumber,
+      currentStep: args.step,
+      currentHat: args.hat,
+      problem: session.problem,
+      hats: session.data.hats,
+      synthesis: session.data.synthesis,
+      completedSteps: session.completedSteps,
+      complete: session.complete,
     };
   });
 }

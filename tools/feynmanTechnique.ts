@@ -1,5 +1,5 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition, TokenRingToolJSONResult,} from "@tokenring-ai/chat/schema";
+import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
@@ -9,7 +9,7 @@ const displayName = "Thinking/feynmanTechnique";
 function execute(
   args: z.output<typeof inputSchema>,
   agent: Agent,
-): TokenRingToolJSONResult<any> {
+): TokenRingToolResult {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.explanations) session.data.explanations = [];
@@ -26,17 +26,14 @@ function execute(
       session.data.analogies.push(args.content);
 
     return {
-      type: "json",
-      data: {
-        stepNumber: session.stepNumber,
-        currentStep: args.step,
-        concept: session.problem,
-        explanations: session.data.explanations,
-        gaps: session.data.gaps,
-        analogies: session.data.analogies,
-        completedSteps: session.completedSteps,
-        complete: session.complete,
-      },
+      stepNumber: session.stepNumber,
+      currentStep: args.step,
+      concept: session.problem,
+      explanations: session.data.explanations,
+      gaps: session.data.gaps,
+      analogies: session.data.analogies,
+      completedSteps: session.completedSteps,
+      complete: session.complete,
     };
   });
 }

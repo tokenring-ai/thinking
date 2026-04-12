@@ -1,5 +1,5 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition, TokenRingToolJSONResult,} from "@tokenring-ai/chat/schema";
+import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
@@ -9,7 +9,7 @@ const displayName = "Thinking/socraticDialogue";
 function execute(
   args: z.output<typeof inputSchema>,
   agent: Agent,
-): TokenRingToolJSONResult<any> {
+): TokenRingToolResult {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.questions) session.data.questions = [];
@@ -36,17 +36,14 @@ function execute(
     }
 
     return {
-      type: "json",
-      data: {
-        stepNumber: session.stepNumber,
-        currentStep: args.step,
-        problem: session.problem,
-        questions: session.data.questions,
-        assumptions: session.data.assumptions,
-        contradictions: session.data.contradictions,
-        completedSteps: session.completedSteps,
-        complete: session.complete,
-      },
+      stepNumber: session.stepNumber,
+      currentStep: args.step,
+      problem: session.problem,
+      questions: session.data.questions,
+      assumptions: session.data.assumptions,
+      contradictions: session.data.contradictions,
+      completedSteps: session.completedSteps,
+      complete: session.complete,
     };
   });
 }

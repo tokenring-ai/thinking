@@ -1,5 +1,5 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition, TokenRingToolJSONResult,} from "@tokenring-ai/chat/schema";
+import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
@@ -9,7 +9,7 @@ const displayName = "Thinking/swotAnalysis";
 function execute(
   args: z.output<typeof inputSchema>,
   agent: Agent,
-): TokenRingToolJSONResult<any> {
+): TokenRingToolResult {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.strengths) session.data.strengths = [];
@@ -26,19 +26,16 @@ function execute(
       session.data.strategy = args.content;
 
     return {
-      type: "json",
-      data: {
-        stepNumber: session.stepNumber,
-        currentStep: args.step,
-        objective: session.problem,
-        strengths: session.data.strengths,
-        weaknesses: session.data.weaknesses,
-        opportunities: session.data.opportunities,
-        threats: session.data.threats,
-        strategy: session.data.strategy,
-        completedSteps: session.completedSteps,
-        complete: session.complete,
-      },
+      stepNumber: session.stepNumber,
+      currentStep: args.step,
+      objective: session.problem,
+      strengths: session.data.strengths,
+      weaknesses: session.data.weaknesses,
+      opportunities: session.data.opportunities,
+      threats: session.data.threats,
+      strategy: session.data.strategy,
+      completedSteps: session.completedSteps,
+      complete: session.complete,
     };
   });
 }

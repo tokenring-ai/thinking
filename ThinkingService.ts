@@ -15,7 +15,7 @@ export default class ThinkingService implements TokenRingService {
     args: any,
     agent: Agent,
     processor: (session: ReasoningSession, args: any) => any,
-  ): any {
+  ): string {
     const state = agent.getState(ThinkingState);
     let session = state.sessions.get(toolName);
 
@@ -45,7 +45,7 @@ export default class ThinkingService implements TokenRingService {
       return result;
     });
 
-    return agent.getState(ThinkingState).sessions.get(toolName);
+    return JSON.stringify(agent.getState(ThinkingState).sessions.get(toolName));
   }
 
   clearSession(toolName: string, agent: Agent): void {

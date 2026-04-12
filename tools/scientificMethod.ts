@@ -1,5 +1,5 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition} from "@tokenring-ai/chat/schema";
+import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
 import {z} from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
@@ -9,9 +9,9 @@ const displayName = "Thinking/scientificMethod";
 function execute(
   args: z.output<typeof inputSchema>,
   agent: Agent,
-): any {
+): TokenRingToolResult {
   const thinkingService = agent.requireServiceByType(ThinkingService);
-  const result = thinkingService.processStep(
+  return thinkingService.processStep(
     name,
     args,
     agent,
@@ -52,26 +52,17 @@ function execute(
       }
 
       return {
-        type: "json",
-        data: {
-          thoughtNumber: session.stepNumber,
-          currentStep: args.step,
-          nextThoughtNeeded: args.nextThoughtNeeded,
-          problem: session.problem,
-          hypotheses: session.data.hypotheses,
-          completedSteps: session.completedSteps,
-          conclusionReached: session.complete,
-          thoughtHistoryLength: session.data.thoughts.length,
-        },
+        thoughtNumber: session.stepNumber,
+        currentStep: args.step,
+        nextThoughtNeeded: args.nextThoughtNeeded,
+        problem: session.problem,
+        hypotheses: session.data.hypotheses,
+        completedSteps: session.completedSteps,
+        conclusionReached: session.complete,
+        thoughtHistoryLength: session.data.thoughts.length,
       };
     },
   );
-
-  if (result.error) {
-    throw new Error(`[${name}] ${result.error}`);
-  }
-
-  return result;
 }
 
 const description = `A strictly disciplined reasoning tool that enforces exact adherence to the scientific method.
