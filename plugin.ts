@@ -15,7 +15,7 @@ export default {
   description: packageJSON.description,
   install(app, _config) {
     app.waitForService(ChatService, (chatService) => {
-      chatService.addTools(tools);
+      chatService.addTools(...tools);
     });
     app.addServices(new ThinkingService());
   },

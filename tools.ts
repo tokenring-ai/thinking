@@ -12,7 +12,7 @@ import sixThinkingHats from "./tools/sixThinkingHats.ts";
 import socraticDialogue from "./tools/socraticDialogue.ts";
 import swotAnalysis from "./tools/swotAnalysis.ts";
 
-export default {
+export default [
   scientificMethod,
   socraticDialogue,
   designThinking,
@@ -26,4 +26,4 @@ export default {
   agileSprint,
   feynmanTechnique,
   sixThinkingHats,
-};
+];
