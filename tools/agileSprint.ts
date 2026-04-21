@@ -1,15 +1,12 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
-import {z} from "zod";
+import type { TokenRingToolDefinition, TokenRingToolResult } from "@tokenring-ai/chat/schema";
+import { z } from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "agile-sprint";
 const displayName = "Thinking/agileSprint";
 
-function execute(
-  args: z.output<typeof inputSchema>,
-  agent: Agent,
-): TokenRingToolResult {
+function execute(args: z.output<typeof inputSchema>, agent: Agent): TokenRingToolResult {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.backlog) session.data.backlog = [];
@@ -22,11 +19,9 @@ function execute(
         story: args.content,
         estimate: args.estimate,
       });
-    if (args.step === "plan_sprint")
-      session.data.currentSprint.push(args.content);
+    if (args.step === "plan_sprint") session.data.currentSprint.push(args.content);
     if (args.step === "execute") session.data.completed.push(args.content);
-    if (args.step === "retrospect")
-      session.data.retrospectives.push(args.content);
+    if (args.step === "retrospect") session.data.retrospectives.push(args.content);
 
     return {
       stepNumber: session.stepNumber,
@@ -47,19 +42,10 @@ const description = `Agile sprint planning tool for iterative development.
 Steps: Define goal → Break into stories → Estimate effort → Prioritize → Plan sprint → Execute → Review → Retrospect`;
 
 const inputSchema = z.object({
-  problem: z.string().optional(),
-  step: z.enum([
-    "define_goal",
-    "break_into_stories",
-    "estimate_effort",
-    "prioritize",
-    "plan_sprint",
-    "execute",
-    "review",
-    "retrospect",
-  ]),
+  problem: z.string().exactOptional(),
+  step: z.enum(["define_goal", "break_into_stories", "estimate_effort", "prioritize", "plan_sprint", "execute", "review", "retrospect"]),
   content: z.string(),
-  estimate: z.number().optional(),
+  estimate: z.number().exactOptional(),
   nextThoughtNeeded: z.boolean(),
 });
 

@@ -1,15 +1,12 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
-import {z} from "zod";
+import type { TokenRingToolDefinition, TokenRingToolResult } from "@tokenring-ai/chat/schema";
+import { z } from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "six-thinking-hats";
 const displayName = "Thinking/sixThinkingHats";
 
-function execute(
-  args: z.output<typeof inputSchema>,
-  agent: Agent,
-): TokenRingToolResult {
+function execute(args: z.output<typeof inputSchema>, agent: Agent): TokenRingToolResult {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.hats)
@@ -45,9 +42,9 @@ const description = `Six thinking hats tool for parallel thinking from different
 Hats: White (facts) → Red (emotions) → Black (risks) → Yellow (benefits) → Green (creativity) → Blue (process)`;
 
 const inputSchema = z.object({
-  problem: z.string().optional(),
+  problem: z.string().exactOptional(),
   step: z.enum(["think", "synthesize"]),
-  hat: z.enum(["white", "red", "black", "yellow", "green", "blue"]).optional(),
+  hat: z.enum(["white", "red", "black", "yellow", "green", "blue"]).exactOptional(),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
 });

@@ -1,26 +1,21 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
-import {z} from "zod";
+import type { TokenRingToolDefinition, TokenRingToolResult } from "@tokenring-ai/chat/schema";
+import { z } from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "dialectical-reasoning";
 const displayName = "Thinking/dialecticalReasoning";
 
-function execute(
-  args: z.output<typeof inputSchema>,
-  agent: Agent,
-): TokenRingToolResult {
+function execute(args: z.output<typeof inputSchema>, agent: Agent): TokenRingToolResult {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (args.step === "state_thesis") session.data.thesis = args.content;
-    if (args.step === "develop_antithesis")
-      session.data.antithesis = args.content;
+    if (args.step === "develop_antithesis") session.data.antithesis = args.content;
     if (args.step === "identify_contradictions") {
       if (!session.data.contradictions) session.data.contradictions = [];
       session.data.contradictions.push(args.content);
     }
-    if (args.step === "find_common_ground")
-      session.data.commonGround = args.content;
+    if (args.step === "find_common_ground") session.data.commonGround = args.content;
     if (args.step === "synthesize") session.data.synthesis = args.content;
 
     return {
@@ -43,14 +38,8 @@ const description = `Dialectical reasoning tool for considering opposing views.
 Steps: State thesis → Develop antithesis → Identify contradictions → Find common ground → Synthesize higher understanding`;
 
 const inputSchema = z.object({
-  problem: z.string().optional(),
-  step: z.enum([
-    "state_thesis",
-    "develop_antithesis",
-    "identify_contradictions",
-    "find_common_ground",
-    "synthesize",
-  ]),
+  problem: z.string().exactOptional(),
+  step: z.enum(["state_thesis", "develop_antithesis", "identify_contradictions", "find_common_ground", "synthesize"]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
 });

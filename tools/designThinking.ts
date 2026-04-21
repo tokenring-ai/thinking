@@ -1,15 +1,12 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
-import {z} from "zod";
+import type { TokenRingToolDefinition, TokenRingToolResult } from "@tokenring-ai/chat/schema";
+import { z } from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "design-thinking";
 const displayName = "Thinking/designThinking";
 
-function execute(
-  args: z.output<typeof inputSchema>,
-  agent: Agent,
-): TokenRingToolResult {
+function execute(args: z.output<typeof inputSchema>, agent: Agent): TokenRingToolResult {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.userNeeds) session.data.userNeeds = [];
@@ -41,15 +38,8 @@ const description = `Design thinking tool for human-centered problem solving.
 Steps: Empathize → Define problem → Ideate → Prototype → Test → Iterate`;
 
 const inputSchema = z.object({
-  problem: z.string().optional(),
-  step: z.enum([
-    "empathize",
-    "define",
-    "ideate",
-    "prototype",
-    "test",
-    "iterate",
-  ]),
+  problem: z.string().exactOptional(),
+  step: z.enum(["empathize", "define", "ideate", "prototype", "test", "iterate"]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
 });

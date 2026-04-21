@@ -1,7 +1,7 @@
-import type {Agent} from "@tokenring-ai/agent";
-import {AgentStateSlice} from "@tokenring-ai/agent/types";
+import type { Agent } from "@tokenring-ai/agent";
+import { AgentStateSlice } from "@tokenring-ai/agent/types";
 import markdownList from "@tokenring-ai/utility/string/markdownList";
-import {z} from "zod";
+import { z } from "zod";
 
 export interface ReasoningSession {
   tool: string;
@@ -42,15 +42,11 @@ export class ThinkingState extends AgentStateSlice<typeof serializationSchema> {
   }
 
   deserialize(data: z.output<typeof serializationSchema>): void {
-    this.sessions = data.sessions
-      ? new Map(Object.entries(data.sessions))
-      : new Map();
+    this.sessions = data.sessions ? new Map(Object.entries(data.sessions)) : new Map();
   }
 
   show(): string {
     return `Active Sessions: ${this.sessions.size}
-${markdownList(Array.from(this.sessions.entries()).map(
-      ([tool, s]) => `${tool}: ${s.stepNumber} steps, ${s.complete ? "complete" : "in progress"}`,
-    ))}`;
+${markdownList(Array.from(this.sessions.entries()).map(([tool, s]) => `${tool}: ${s.stepNumber} steps, ${s.complete ? "complete" : "in progress"}`))}`;
   }
 }

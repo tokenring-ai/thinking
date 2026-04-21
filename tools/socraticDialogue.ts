@@ -1,25 +1,19 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
-import {z} from "zod";
+import type { TokenRingToolDefinition, TokenRingToolResult } from "@tokenring-ai/chat/schema";
+import { z } from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "socratic-dialogue";
 const displayName = "Thinking/socraticDialogue";
 
-function execute(
-  args: z.output<typeof inputSchema>,
-  agent: Agent,
-): TokenRingToolResult {
+function execute(args: z.output<typeof inputSchema>, agent: Agent): TokenRingToolResult {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.questions) session.data.questions = [];
     if (!session.data.assumptions) session.data.assumptions = [];
     if (!session.data.contradictions) session.data.contradictions = [];
 
-    if (
-      args.step === "question_formulation" ||
-      args.step === "challenge_assumption"
-    ) {
+    if (args.step === "question_formulation" || args.step === "challenge_assumption") {
       session.data.questions.push({
         step: session.stepNumber,
         content: args.content,
@@ -53,15 +47,8 @@ const description = `Socratic dialogue tool for questioning assumptions through 
 Steps: Question formulation → Assumption identification → Challenge assumption → Explore contradiction → Refine understanding → Synthesis`;
 
 const inputSchema = z.object({
-  problem: z.string().optional(),
-  step: z.enum([
-    "question_formulation",
-    "assumption_identification",
-    "challenge_assumption",
-    "explore_contradiction",
-    "refine_understanding",
-    "synthesis",
-  ]),
+  problem: z.string().exactOptional(),
+  step: z.enum(["question_formulation", "assumption_identification", "challenge_assumption", "explore_contradiction", "refine_understanding", "synthesis"]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
 });

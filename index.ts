@@ -1,1 +1,1 @@
-export {default as ThinkingService} from "./ThinkingService.ts";
+export { default as ThinkingService } from "./ThinkingService.ts";

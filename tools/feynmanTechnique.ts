@@ -1,15 +1,12 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
-import {z} from "zod";
+import type { TokenRingToolDefinition, TokenRingToolResult } from "@tokenring-ai/chat/schema";
+import { z } from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "feynman-technique";
 const displayName = "Thinking/feynmanTechnique";
 
-function execute(
-  args: z.output<typeof inputSchema>,
-  agent: Agent,
-): TokenRingToolResult {
+function execute(args: z.output<typeof inputSchema>, agent: Agent): TokenRingToolResult {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.explanations) session.data.explanations = [];
@@ -22,8 +19,7 @@ function execute(
         text: args.content,
       });
     if (args.step === "identify_gaps") session.data.gaps.push(args.content);
-    if (args.step === "use_analogies")
-      session.data.analogies.push(args.content);
+    if (args.step === "use_analogies") session.data.analogies.push(args.content);
 
     return {
       stepNumber: session.stepNumber,
@@ -43,15 +39,8 @@ const description = `Feynman technique for learning through explanation.
 Steps: Choose concept → Explain simply → Identify gaps → Review source → Simplify further → Use analogies`;
 
 const inputSchema = z.object({
-  problem: z.string().optional().describe("The concept to understand"),
-  step: z.enum([
-    "choose_concept",
-    "explain_simply",
-    "identify_gaps",
-    "review_source",
-    "simplify_further",
-    "use_analogies",
-  ]),
+  problem: z.string().exactOptional().describe("The concept to understand"),
+  step: z.enum(["choose_concept", "explain_simply", "identify_gaps", "review_source", "simplify_further", "use_analogies"]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
 });

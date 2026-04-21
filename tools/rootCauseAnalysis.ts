@@ -1,15 +1,12 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
-import {z} from "zod";
+import type { TokenRingToolDefinition, TokenRingToolResult } from "@tokenring-ai/chat/schema";
+import { z } from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "root-cause-analysis";
 const displayName = "Thinking/rootCauseAnalysis";
 
-function execute(
-  args: z.output<typeof inputSchema>,
-  agent: Agent,
-): TokenRingToolResult {
+function execute(args: z.output<typeof inputSchema>, agent: Agent): TokenRingToolResult {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.whyChain) session.data.whyChain = [];
@@ -45,13 +42,8 @@ const description = `Root cause analysis (5 Whys) tool for drilling down to fund
 Steps: State problem → Ask why → Record answer → Ask why again (repeat 5x) → Identify root cause → Propose solution`;
 
 const inputSchema = z.object({
-  problem: z.string().optional(),
-  step: z.enum([
-    "state_problem",
-    "ask_why",
-    "identify_root_cause",
-    "propose_solution",
-  ]),
+  problem: z.string().exactOptional(),
+  step: z.enum(["state_problem", "ask_why", "identify_root_cause", "propose_solution"]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
 });

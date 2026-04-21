@@ -1,28 +1,21 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
-import {z} from "zod";
+import type { TokenRingToolDefinition, TokenRingToolResult } from "@tokenring-ai/chat/schema";
+import { z } from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "first-principles";
 const displayName = "Thinking/firstPrinciples";
 
-function execute(
-  args: z.output<typeof inputSchema>,
-  agent: Agent,
-): TokenRingToolResult {
+function execute(args: z.output<typeof inputSchema>, agent: Agent): TokenRingToolResult {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.assumptions) session.data.assumptions = [];
     if (!session.data.fundamentalTruths) session.data.fundamentalTruths = [];
-    if (!session.data.reconstructionSteps)
-      session.data.reconstructionSteps = [];
+    if (!session.data.reconstructionSteps) session.data.reconstructionSteps = [];
 
-    if (args.step === "identify_assumptions")
-      session.data.assumptions.push(args.content);
-    if (args.step === "break_to_fundamentals")
-      session.data.fundamentalTruths.push(args.content);
-    if (args.step === "rebuild_from_basics")
-      session.data.reconstructionSteps.push(args.content);
+    if (args.step === "identify_assumptions") session.data.assumptions.push(args.content);
+    if (args.step === "break_to_fundamentals") session.data.fundamentalTruths.push(args.content);
+    if (args.step === "rebuild_from_basics") session.data.reconstructionSteps.push(args.content);
     if (args.step === "novel_solution") session.data.solution = args.content;
 
     return {
@@ -44,15 +37,8 @@ const description = `First principles thinking tool for breaking down to fundame
 Steps: State problem → Identify assumptions → Challenge assumptions → Break to fundamental truths → Rebuild from basics → Novel solution`;
 
 const inputSchema = z.object({
-  problem: z.string().optional(),
-  step: z.enum([
-    "state_problem",
-    "identify_assumptions",
-    "challenge_assumptions",
-    "break_to_fundamentals",
-    "rebuild_from_basics",
-    "novel_solution",
-  ]),
+  problem: z.string().exactOptional(),
+  step: z.enum(["state_problem", "identify_assumptions", "challenge_assumptions", "break_to_fundamentals", "rebuild_from_basics", "novel_solution"]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
 });

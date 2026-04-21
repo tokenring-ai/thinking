@@ -1,15 +1,12 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
-import {z} from "zod";
+import type { TokenRingToolDefinition, TokenRingToolResult } from "@tokenring-ai/chat/schema";
+import { z } from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "decision-matrix";
 const displayName = "Thinking/decisionMatrix";
 
-function execute(
-  args: z.output<typeof inputSchema>,
-  agent: Agent,
-): TokenRingToolResult {
+function execute(args: z.output<typeof inputSchema>, agent: Agent): TokenRingToolResult {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.options) session.data.options = [];
@@ -27,8 +24,7 @@ function execute(
       const key = `${args.option}:${args.criterion}`;
       session.data.scores[key] = args.score;
     }
-    if (args.step === "calculate_decide")
-      session.data.recommendation = args.content;
+    if (args.step === "calculate_decide") session.data.recommendation = args.content;
 
     return {
       stepNumber: session.stepNumber,
@@ -49,20 +45,13 @@ const description = `Decision matrix tool for structured multi-criteria decision
 Steps: Define decision → List options → Define criteria → Weight criteria → Score each option → Calculate totals → Decide`;
 
 const inputSchema = z.object({
-  problem: z.string().optional(),
-  step: z.enum([
-    "define_decision",
-    "list_options",
-    "define_criteria",
-    "weight_criteria",
-    "score_options",
-    "calculate_decide",
-  ]),
+  problem: z.string().exactOptional(),
+  step: z.enum(["define_decision", "list_options", "define_criteria", "weight_criteria", "score_options", "calculate_decide"]),
   content: z.string(),
-  weight: z.number().optional(),
-  option: z.string().optional(),
-  criterion: z.string().optional(),
-  score: z.number().optional(),
+  weight: z.number().exactOptional(),
+  option: z.string().exactOptional(),
+  criterion: z.string().exactOptional(),
+  score: z.number().exactOptional(),
   nextThoughtNeeded: z.boolean(),
 });
 

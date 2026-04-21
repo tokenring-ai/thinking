@@ -1,15 +1,12 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
-import {z} from "zod";
+import type { TokenRingToolDefinition, TokenRingToolResult } from "@tokenring-ai/chat/schema";
+import { z } from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "swot-analysis";
 const displayName = "Thinking/swotAnalysis";
 
-function execute(
-  args: z.output<typeof inputSchema>,
-  agent: Agent,
-): TokenRingToolResult {
+function execute(args: z.output<typeof inputSchema>, agent: Agent): TokenRingToolResult {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.strengths) session.data.strengths = [];
@@ -19,11 +16,9 @@ function execute(
 
     if (args.step === "strengths") session.data.strengths.push(args.content);
     if (args.step === "weaknesses") session.data.weaknesses.push(args.content);
-    if (args.step === "opportunities")
-      session.data.opportunities.push(args.content);
+    if (args.step === "opportunities") session.data.opportunities.push(args.content);
     if (args.step === "threats") session.data.threats.push(args.content);
-    if (args.step === "synthesize_strategy")
-      session.data.strategy = args.content;
+    if (args.step === "synthesize_strategy") session.data.strategy = args.content;
 
     return {
       stepNumber: session.stepNumber,
@@ -45,15 +40,8 @@ const description = `SWOT analysis tool for structured strategic planning.
 Steps: Define objective → Identify strengths → Identify weaknesses → Identify opportunities → Identify threats → Synthesize strategy`;
 
 const inputSchema = z.object({
-  problem: z.string().optional().describe("The objective or goal to analyze"),
-  step: z.enum([
-    "define_objective",
-    "strengths",
-    "weaknesses",
-    "opportunities",
-    "threats",
-    "synthesize_strategy",
-  ]),
+  problem: z.string().exactOptional().describe("The objective or goal to analyze"),
+  step: z.enum(["define_objective", "strengths", "weaknesses", "opportunities", "threats", "synthesize_strategy"]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
 });

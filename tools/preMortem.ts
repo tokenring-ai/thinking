@@ -1,15 +1,12 @@
 import type Agent from "@tokenring-ai/agent/Agent";
-import type {TokenRingToolDefinition, TokenRingToolResult} from "@tokenring-ai/chat/schema";
-import {z} from "zod";
+import type { TokenRingToolDefinition, TokenRingToolResult } from "@tokenring-ai/chat/schema";
+import { z } from "zod";
 import ThinkingService from "../ThinkingService.ts";
 
 const name = "pre-mortem";
 const displayName = "Thinking/preMortem";
 
-function execute(
-  args: z.output<typeof inputSchema>,
-  agent: Agent,
-): TokenRingToolResult {
+function execute(args: z.output<typeof inputSchema>, agent: Agent): TokenRingToolResult {
   const thinkingService = agent.requireServiceByType(ThinkingService);
   return thinkingService.processStep(name, args, agent, (session, args) => {
     if (!session.data.failureScenarios) session.data.failureScenarios = [];
@@ -49,18 +46,11 @@ const description = `Pre-mortem analysis tool for imagining failure to prevent i
 Steps: Define goal → Assume failure → List reasons for failure → Assess likelihood → Develop mitigations → Revise plan`;
 
 const inputSchema = z.object({
-  problem: z.string().optional().describe("The goal or plan to analyze"),
-  step: z.enum([
-    "define_goal",
-    "assume_failure",
-    "list_failure_reasons",
-    "assess_likelihood",
-    "develop_mitigations",
-    "revise_plan",
-  ]),
+  problem: z.string().exactOptional().describe("The goal or plan to analyze"),
+  step: z.enum(["define_goal", "assume_failure", "list_failure_reasons", "assess_likelihood", "develop_mitigations", "revise_plan"]),
   content: z.string(),
-  likelihood: z.enum(["low", "medium", "high"]).optional(),
-  targets_scenario: z.string().optional(),
+  likelihood: z.enum(["low", "medium", "high"]).exactOptional(),
+  targets_scenario: z.string().exactOptional(),
   nextThoughtNeeded: z.boolean(),
 });
 
