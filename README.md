@@ -1,14 +1,19 @@
 # @tokenring-ai/thinking
 
-Structured reasoning service with 13 specialized thinking tools for disciplined problem-solving and persistent state management.
+Structured reasoning service with 13 specialized thinking tools for disciplined problem-solving and persistent state
+management.
 
 ## Overview
 
-The `@tokenring-ai/thinking` package provides a comprehensive suite of 13 structured reasoning tools that implement various thinking methodologies with persistent state management. Each tool guides AI agents through disciplined problem-solving using proven human cognitive frameworks and maintains reasoning sessions across multiple calls.
+The `@tokenring-ai/thinking` package provides a comprehensive suite of 13 structured reasoning tools that implement
+various thinking methodologies with persistent state management. Each tool guides AI agents through disciplined
+problem-solving using proven human cognitive frameworks and maintains reasoning sessions across multiple calls.
 
 ## Key Features
 
-- **13 Structured Thinking Tools**: Scientific method, design thinking, root cause analysis, SWOT analysis, pre-mortem, dialectical reasoning, first principles, decision matrix, lateral thinking, agile sprint, Feynman technique, socratic dialogue, and six thinking hats
+- **13 Structured Thinking Tools**: Scientific method, design thinking, root cause analysis, SWOT analysis, pre-mortem,
+  dialectical reasoning, first principles, decision matrix, lateral thinking, agile sprint, Feynman technique, socratic
+  dialogue, and six thinking hats
 - **State Management**: Persistent reasoning sessions that track progress across multiple calls
 - **Automatic Integration**: Tools automatically register with chat services and agents via plugin system
 - **Session Isolation**: Independent session tracking for each reasoning tool
@@ -25,11 +30,12 @@ The `@tokenring-ai/thinking` package provides a comprehensive suite of 13 struct
 bun add @tokenring-ai/thinking
 ```
 
-The package automatically registers with the Token Ring application when included in your application's dependencies via the plugin system.
+The package automatically registers with the Token Ring application when included in your application's dependencies via
+the plugin system.
 
 ## Package Structure
 
-```
+```text
 pkg/thinking/
 ├── index.ts                    # Package exports (ThinkingService)
 ├── plugin.ts                   # Auto-registration plugin
@@ -77,19 +83,19 @@ const thinkingService = new ThinkingService();
 
 **Properties:**
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `name` | `string` | Service name ("ThinkingService") |
+| Property      | Type     | Description                                                         |
+|---------------|----------|---------------------------------------------------------------------|
+| `name`        | `string` | Service name ("ThinkingService")                                    |
 | `description` | `string` | Service description ("Provides structured reasoning functionality") |
 
 **Methods:**
 
-| Method | Parameters | Returns | Description |
-|--------|------------|---------|-------------|
-| `attach` | `agent: Agent` | `void` | Initializes ThinkingState for agent |
-| `processStep` | `toolName: string`, `args: any`, `agent: Agent`, `processor: (session: ReasoningSession, args: any) => any` | `ReasoningSession` | Processes step in reasoning session and returns updated session |
-| `clearSession` | `toolName: string`, `agent: Agent` | `void` | Clears specific tool session |
-| `clearAll` | `agent: Agent` | `void` | Clears all reasoning sessions |
+| Method         | Parameters                                                                                                  | Returns  | Description                                                 |
+|----------------|-------------------------------------------------------------------------------------------------------------|----------|-------------------------------------------------------------|
+| `attach`       | `agent: Agent`                                                                                              | `void`   | Initializes ThinkingState for agent                         |
+| `processStep`  | `toolName: string`, `args: any`, `agent: Agent`, `processor: (session: ReasoningSession, args: any) => any` | `string` | Processes step in reasoning session and returns JSON result |
+| `clearSession` | `toolName: string`, `agent: Agent`                                                                          | `void`   | Clears specific tool session                                |
+| `clearAll`     | `agent: Agent`                                                                                              | `void`   | Clears all reasoning sessions                               |
 
 **Usage Example:**
 
@@ -132,22 +138,22 @@ const state = agent.getState(ThinkingState);
 
 **Properties:**
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `name` | `string` | State slice name ("ThinkingState") |
-| `serializationSchema` | `ZodSchema` | Zod schema for serialization |
-| `sessions` | `Map<string, ReasoningSession>` | Active reasoning sessions |
+| Property              | Type                            | Description                        |
+|-----------------------|---------------------------------|------------------------------------|
+| `name`                | `string`                        | State slice name ("ThinkingState") |
+| `serializationSchema` | `ZodSchema`                     | Zod schema for serialization       |
+| `sessions`            | `Map<string, ReasoningSession>` | Active reasoning sessions          |
 
 **Methods:**
 
-| Method | Parameters | Returns | Description |
-|--------|------------|---------|-------------|
-| `constructor` | `data: Partial<ThinkingState>` | `void` | Create new state instance with optional initial data |
-| `transferStateFromParent` | `parent: Agent` | `void` | Transfer state from parent agent |
-| `reset` | `void` | `void` | Reset state (clears all sessions) |
-| `serialize` | `void` | `z.output<typeof serializationSchema>` | Returns serialized state object |
-| `deserialize` | `data: z.output<typeof serializationSchema>` | `void` | Load state from serialized data |
-| `show` | `void` | `string[]` | Returns session summary array |
+| Method                    | Parameters                                   | Returns                                | Description                                          |
+|---------------------------|----------------------------------------------|----------------------------------------|------------------------------------------------------|
+| `constructor`             | `data: Partial<ThinkingState>`               | `void`                                 | Create new state instance with optional initial data |
+| `transferStateFromParent` | `parent: Agent`                              | `void`                                 | Transfer state from parent agent                     |
+| `reset`                   | `void`                                       | `void`                                 | Reset state (clears all sessions)                    |
+| `serialize`               | `void`                                       | `z.output<typeof serializationSchema>` | Returns serialized state object                      |
+| `deserialize`             | `data: z.output<typeof serializationSchema>` | `void`                                 | Load state from serialized data                      |
+| `show`                    | `void`                                       | `string`                               | Returns session summary string                       |
 
 **Usage Example:**
 
@@ -159,7 +165,7 @@ const state = agent.getState(ThinkingState);
 console.log(state.show());
 // Output:
 // Active Sessions: 1
-//   scientific-method-reasoning: 3 steps, in progress
+//   - scientific-method-reasoning: 3 steps, in progress
 
 // Serialize state
 const serialized = state.serialize();
@@ -193,24 +199,29 @@ interface ReasoningSession {
 
 **Properties:**
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `tool` | `string` | Tool name (e.g., "scientific-method-reasoning") |
-| `problem` | `string` | Problem being investigated |
-| `stepNumber` | `number` | Current step count in the session |
-| `data` | `Record<string, any>` | Tool-specific data storage |
-| `completedSteps` | `string[]` | Array of completed step names |
-| `complete` | `boolean` | Whether reasoning is complete |
+| Property         | Type                  | Description                                     |
+|------------------|-----------------------|-------------------------------------------------|
+| `tool`           | `string`              | Tool name (e.g., "scientific-method-reasoning") |
+| `problem`        | `string`              | Problem being investigated                      |
+| `stepNumber`     | `number`              | Current step count in the session               |
+| `data`           | `Record<string, any>` | Tool-specific data storage                      |
+| `completedSteps` | `string[]`            | Array of completed step names                   |
+| `complete`       | `boolean`             | Whether reasoning is complete                   |
 
 ## Available Reasoning Tools
 
 ### 1. Scientific Method (`scientific-method-reasoning`)
 
-A strictly disciplined reasoning tool that enforces exact adherence to the scientific method. The tool maintains persistent state anchored to a single, fixed problem/question. Every contribution must explicitly advance one of the core steps of the scientific method.
+A strictly disciplined reasoning tool that enforces exact adherence to the scientific method. The tool maintains
+persistent state anchored to a single, fixed problem/question. Every contribution must explicitly advance one of the
+core steps of the scientific method.
 
 **Description:**
 
-A strictly disciplined reasoning tool that enforces exact adherence to the scientific method. The tool maintains persistent state anchored to a single, fixed problem/question. Every contribution must explicitly advance one of the core steps of the scientific method. No free-form thoughts, confidence scores, summaries, or extraneous features are permitted—only direct contributions to the defined steps.
+A strictly disciplined reasoning tool that enforces exact adherence to the scientific method. The tool maintains
+persistent state anchored to a single, fixed problem/question. Every contribution must explicitly advance one of the
+core steps of the scientific method. No free-form thoughts, confidence scores, summaries, or extraneous features are
+permitted—only direct contributions to the defined steps.
 
 **Core Steps:**
 
@@ -218,7 +229,8 @@ A strictly disciplined reasoning tool that enforces exact adherence to the scien
 2. `background_research` - Gather and restate existing knowledge, constraints, or facts
 3. `hypothesis_formulation` - Formulate testable hypotheses (one or more; each must be falsifiable)
 4. `prediction` - State specific, testable predictions derived from a hypothesis
-5. `testing_experimentation` - Perform tests (deductive reasoning, calculations, counterexamples, or external verification) to gather evidence
+5. `testing_experimentation` - Perform tests (deductive reasoning, calculations, counterexamples, or external
+   verification) to gather evidence
 6. `analysis` - Interpret evidence objectively—does it support, refute, or require refinement of the hypothesis?
 7. `conclusion` - Draw evidence-based conclusion; if unresolved, iterate by revising earlier steps
 
@@ -226,7 +238,7 @@ A strictly disciplined reasoning tool that enforces exact adherence to the scien
 
 ```typescript
 z.object({
-  problem: z.string().optional().describe("The exact question or problem to investigate—required on first call only"),
+  problem: z.string().exactOptional().describe("The exact question or problem to investigate—required on first call only"),
   step: z.enum([
     "question_observation",
     "background_research",
@@ -237,14 +249,14 @@ z.object({
     "conclusion"
   ]).describe("The specific scientific method step this contribution advances"),
   content: z.string().describe("Clear, focused contribution to the chosen step"),
-  targets_hypothesis_id: z.array(z.string()).optional().describe("Hypothesis ID(s) this step references (e.g., ['h1'])—required for prediction, testing, analysis"),
+  targets_hypothesis_id: z.array(z.string()).exactOptional().describe("Hypothesis ID(s) this step references (e.g., ['h1'])—required for prediction, testing, analysis"),
   hypothesis_update: z.object({
-    hypothesis_id: z.string().optional().describe("Existing ID to modify/refute (omit for new hypothesis)"),
-    new_hypothesis_text: z.string().optional().describe("Text of a new or revised hypothesis (must be testable)"),
-    action: z.enum(["propose", "refine", "refute", "support"]).optional().describe("Action taken on the hypothesis in this step")
-  }).optional().describe("Create or update a hypothesis in hypothesis_formulation or analysis steps"),
+    hypothesis_id: z.string().exactOptional().describe("Existing ID to modify/refute (omit for new hypothesis)"),
+    new_hypothesis_text: z.string().exactOptional().describe("Text of a new or revised hypothesis (must be testable)"),
+    action: z.enum(["propose", "refine", "refute", "support"]).exactOptional().describe("Action taken on the hypothesis in this step")
+  }).exactOptional().describe("Create or update a hypothesis in hypothesis_formulation or analysis steps"),
   nextThoughtNeeded: z.boolean().describe("False only when conclusion step provides a final, evidence-based answer"),
-  final_answer: z.string().optional().describe("The concluded answer—required when nextThoughtNeeded is false; must be justified by prior steps")
+  final_answer: z.string().exactOptional().describe("The concluded answer—required when nextThoughtNeeded is false; must be justified by prior steps")
 });
 ```
 
@@ -304,7 +316,7 @@ Questions assumptions through structured inquiry.
 
 ```typescript
 z.object({
-  problem: z.string().optional(),
+  problem: z.string().exactOptional(),
   step: z.enum(["question_formulation", "assumption_identification", "challenge_assumption", "explore_contradiction", "refine_understanding", "synthesis"]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
@@ -351,7 +363,7 @@ Human-centered design process.
 
 ```typescript
 z.object({
-  problem: z.string().optional(),
+  problem: z.string().exactOptional(),
   step: z.enum(["empathize", "define", "ideate", "prototype", "test", "iterate"]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
@@ -396,7 +408,7 @@ await agent.executeTool('design-thinking', {
 
 ```typescript
 z.object({
-  problem: z.string().optional(),
+  problem: z.string().exactOptional(),
   step: z.enum(["state_problem", "ask_why", "identify_root_cause", "propose_solution"]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
@@ -443,7 +455,7 @@ Strategic planning through strengths, weaknesses, opportunities, threats.
 
 ```typescript
 z.object({
-  problem: z.string().optional().describe("The objective or goal to analyze"),
+  problem: z.string().exactOptional().describe("The objective or goal to analyze"),
   step: z.enum(["define_objective", "strengths", "weaknesses", "opportunities", "threats", "synthesize_strategy"]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
@@ -490,11 +502,11 @@ Imagines failure to prevent it.
 
 ```typescript
 z.object({
-  problem: z.string().optional().describe("The goal or plan to analyze"),
+  problem: z.string().exactOptional().describe("The goal or plan to analyze"),
   step: z.enum(["define_goal", "assume_failure", "list_failure_reasons", "assess_likelihood", "develop_mitigations", "revise_plan"]),
   content: z.string(),
-  likelihood: z.enum(["low", "medium", "high"]).optional(),
-  targets_scenario: z.string().optional(),
+  likelihood: z.enum(["low", "medium", "high"]).exactOptional(),
+  targets_scenario: z.string().exactOptional(),
   nextThoughtNeeded: z.boolean(),
 });
 ```
@@ -540,7 +552,7 @@ Considers opposing views.
 
 ```typescript
 z.object({
-  problem: z.string().optional(),
+  problem: z.string().exactOptional(),
   step: z.enum(["state_thesis", "develop_antithesis", "identify_contradictions", "find_common_ground", "synthesize"]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
@@ -587,7 +599,7 @@ Breaks down to fundamental truths.
 
 ```typescript
 z.object({
-  problem: z.string().optional(),
+  problem: z.string().exactOptional(),
   step: z.enum(["state_problem", "identify_assumptions", "challenge_assumptions", "break_to_fundamentals", "rebuild_from_basics", "novel_solution"]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
@@ -634,13 +646,13 @@ Structured multi-criteria decision making.
 
 ```typescript
 z.object({
-  problem: z.string().optional(),
+  problem: z.string().exactOptional(),
   step: z.enum(["define_decision", "list_options", "define_criteria", "weight_criteria", "score_options", "calculate_decide"]),
   content: z.string(),
-  weight: z.number().optional(),
-  option: z.string().optional(),
-  criterion: z.string().optional(),
-  score: z.number().optional(),
+  weight: z.number().exactOptional(),
+  option: z.string().exactOptional(),
+  criterion: z.string().exactOptional(),
+  score: z.number().exactOptional(),
   nextThoughtNeeded: z.boolean(),
 });
 ```
@@ -694,7 +706,7 @@ Creative problem reframing.
 
 ```typescript
 z.object({
-  problem: z.string().optional(),
+  problem: z.string().exactOptional(),
   step: z.enum(["state_problem", "generate_stimulus", "force_connection", "explore_tangent", "extract_insight", "apply_to_problem"]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
@@ -743,10 +755,10 @@ Iterative development planning.
 
 ```typescript
 z.object({
-  problem: z.string().optional(),
+  problem: z.string().exactOptional(),
   step: z.enum(["define_goal", "break_into_stories", "estimate_effort", "prioritize", "plan_sprint", "execute", "review", "retrospect"]),
   content: z.string(),
-  estimate: z.number().optional(),
+  estimate: z.number().exactOptional(),
   nextThoughtNeeded: z.boolean(),
 });
 ```
@@ -793,7 +805,7 @@ Learning through explanation.
 
 ```typescript
 z.object({
-  problem: z.string().optional().describe("The concept to understand"),
+  problem: z.string().exactOptional().describe("The concept to understand"),
   step: z.enum(["choose_concept", "explain_simply", "identify_gaps", "review_source", "simplify_further", "use_analogies"]),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
@@ -845,9 +857,9 @@ Parallel thinking from different perspectives.
 
 ```typescript
 z.object({
-  problem: z.string().optional(),
+  problem: z.string().exactOptional(),
   step: z.enum(["think", "synthesize"]),
-  hat: z.enum(["white", "red", "black", "yellow", "green", "blue"]).optional(),
+  hat: z.enum(["white", "red", "black", "yellow", "green", "blue"]).exactOptional(),
   content: z.string(),
   nextThoughtNeeded: z.boolean(),
 });
@@ -991,7 +1003,8 @@ state.reset();
 
 ## Configuration
 
-No additional configuration required. The package uses sensible defaults and automatically integrates with the Token Ring framework.
+No additional configuration required. The package uses sensible defaults and automatically integrates with the Token
+Ring framework.
 
 ## Usage Examples
 
@@ -1028,7 +1041,7 @@ console.log(state.show());
 
 // Output:
 // Active Sessions: 1
-//   scientific-method-reasoning: 3 steps, in progress
+//   - scientific-method-reasoning: 3 steps, in progress
 ```
 
 ### Clearing Sessions
@@ -1060,7 +1073,7 @@ await agent.executeTool('pre-mortem', {
 });
 
 await agent.executeTool('swot-analysis', {
-  problem: "Launch new product line",
+  problem: "Launch new Product line",
   step: "strengths",
   content: "Strong brand recognition and customer loyalty",
   nextThoughtNeeded: true
@@ -1095,7 +1108,7 @@ bun run test:coverage
 
 ## API Reference
 
-### ThinkingService
+### ThinkingService API
 
 Main service class that manages reasoning sessions and state persistence.
 
@@ -1107,19 +1120,19 @@ const thinkingService = new ThinkingService();
 
 **Properties:**
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `name` | `string` | Service name ("ThinkingService") |
+| Property      | Type     | Description                                                         |
+|---------------|----------|---------------------------------------------------------------------|
+| `name`        | `string` | Service name ("ThinkingService")                                    |
 | `description` | `string` | Service description ("Provides structured reasoning functionality") |
 
 **Methods:**
 
-| Method | Parameters | Returns | Description |
-|--------|------------|---------|-------------|
-| `attach` | `agent: Agent` | `void` | Initializes ThinkingState for agent |
-| `processStep` | `toolName: string`, `args: any`, `agent: Agent`, `processor: (session: ReasoningSession, args: any) => any` | `ReasoningSession` | Processes step in reasoning session and returns updated session |
-| `clearSession` | `toolName: string`, `agent: Agent` | `void` | Clears specific tool session |
-| `clearAll` | `agent: Agent` | `void` | Clears all reasoning sessions |
+| Method         | Parameters                                                                                                  | Returns  | Description                                               |
+|----------------|-------------------------------------------------------------------------------------------------------------|----------|-----------------------------------------------------------|
+| `attach`       | `agent: Agent`                                                                                              | `void`   | Initializes ThinkingState for agent                       |
+| `processStep`  | `toolName: string`, `args: any`, `agent: Agent`, `processor: (session: ReasoningSession, args: any) => any` | `string` | Processes step and returns JSON string of updated session |
+| `clearSession` | `toolName: string`, `agent: Agent`                                                                          | `void`   | Clears specific tool session                              |
+| `clearAll`     | `agent: Agent`                                                                                              | `void`   | Clears all reasoning sessions                             |
 
 ```typescript
 class ThinkingService implements TokenRingService {
@@ -1127,13 +1140,16 @@ class ThinkingService implements TokenRingService {
   description = "Provides structured reasoning functionality";
 
   attach(agent: Agent): void;
-  processStep(toolName: string, args: any, agent: Agent, processor: (session: ReasoningSession, args: any) => any): any;
+
+  processStep(toolName: string, args: any, agent: Agent, processor: (session: ReasoningSession, args: any) => any): string;
+
   clearSession(toolName: string, agent: Agent): void;
+
   clearAll(agent: Agent): void;
 }
 ```
 
-### ThinkingState
+### ThinkingState API
 
 Agent state slice that manages reasoning session persistence.
 
@@ -1146,22 +1162,22 @@ const state = agent.getState(ThinkingState);
 
 **Properties:**
 
-| Property | Type | Description |
-|----------|------|-------------|
-| `name` | `string` | State slice name ("ThinkingState") |
-| `serializationSchema` | `ZodSchema` | Zod schema for serialization |
-| `sessions` | `Map<string, ReasoningSession>` | Active reasoning sessions |
+| Property              | Type                            | Description                        |
+|-----------------------|---------------------------------|------------------------------------|
+| `name`                | `string`                        | State slice name ("ThinkingState") |
+| `serializationSchema` | `ZodSchema`                     | Zod schema for serialization       |
+| `sessions`            | `Map<string, ReasoningSession>` | Active reasoning sessions          |
 
 **Methods:**
 
-| Method | Parameters | Returns | Description |
-|--------|------------|---------|-------------|
-| `constructor` | `data: Partial<ThinkingState>` | `void` | Create new state instance with optional initial data |
-| `transferStateFromParent` | `parent: Agent` | `void` | Transfer state from parent agent |
-| `reset` | `void` | `void` | Reset state (clears all sessions) |
-| `serialize` | `void` | `z.output<typeof serializationSchema>` | Returns serialized state object |
-| `deserialize` | `data: z.output<typeof serializationSchema>` | `void` | Load state from serialized data |
-| `show` | `void` | `string[]` | Returns session summary array |
+| Method                    | Parameters                                   | Returns                                | Description                                          |
+|---------------------------|----------------------------------------------|----------------------------------------|------------------------------------------------------|
+| `constructor`             | `data: Partial<ThinkingState>`               | `void`                                 | Create new state instance with optional initial data |
+| `transferStateFromParent` | `parent: Agent`                              | `void`                                 | Transfer state from parent agent                     |
+| `reset`                   | `void`                                       | `void`                                 | Reset state (clears all sessions)                    |
+| `serialize`               | `void`                                       | `z.output<typeof serializationSchema>` | Returns serialized state object                      |
+| `deserialize`             | `data: z.output<typeof serializationSchema>` | `void`                                 | Load state from serialized data                      |
+| `show`                    | `void`                                       | `string`                               | Returns session summary string                       |
 
 ```typescript
 class ThinkingState extends AgentStateSlice<typeof serializationSchema> {
@@ -1170,15 +1186,20 @@ class ThinkingState extends AgentStateSlice<typeof serializationSchema> {
   sessions: Map<string, ReasoningSession> = new Map();
 
   constructor(data: Partial<ThinkingState> = {});
+
   transferStateFromParent(parent: Agent): void;
+
   reset(): void;
+
   serialize(): z.output<typeof serializationSchema>;
+
   deserialize(data: z.output<typeof serializationSchema>): void;
-  show(): string[];
+
+  show(): string;
 }
 ```
 
-### ReasoningSession
+### ReasoningSession Interface
 
 ```typescript
 interface ReasoningSession {
@@ -1197,13 +1218,16 @@ All tools follow a consistent input schema pattern:
 
 ```typescript
 z.object({
-  problem: z.string().optional(),       // Required on first call
+  problem: z.string().exactOptional(),  // Required on first call
   step: z.enum([...]),                  // Tool-specific step enumeration
   content: z.string(),                  // Content for the current step
   nextThoughtNeeded: z.boolean(),       // False when reasoning is complete
   // Tool-specific additional fields
 })
 ```
+
+**Note:** The schema uses `exactOptional()` which means the field must be explicitly omitted (not present) rather than
+set to `undefined`. This is a Zod feature that provides stricter type checking.
 
 ### Example Tool Input
 
@@ -1223,6 +1247,7 @@ await agent.executeTool('first-principles', {
 - `@tokenring-ai/app` (0.2.0) - Application framework and service management
 - `@tokenring-ai/chat` (0.2.0) - Chat service and tool definitions
 - `@tokenring-ai/agent` (0.2.0) - Agent system and state management
+- `@tokenring-ai/utility` (0.2.0) - Utility functions and helpers
 - `zod` (^4.3.6) - Schema validation
 
 ### Development Dependencies

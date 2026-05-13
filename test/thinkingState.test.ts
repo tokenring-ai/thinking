@@ -1,5 +1,5 @@
-import {beforeEach, describe, expect, it} from "vitest";
-import {ReasoningSession, ThinkingState} from "../state/thinkingState";
+import { beforeEach, describe, expect, it } from "vitest";
+import { ReasoningSession, ThinkingState } from "../state/thinkingState";
 
 describe("ThinkingState", () => {
   let state: ThinkingState;
@@ -64,7 +64,7 @@ describe("ThinkingState", () => {
       state.sessions.set("tool2", session2);
 
       const serialized = state.serialize();
-      
+
       expect(serialized).toEqual({
         sessions: {
           "tool1": session1,
@@ -147,7 +147,7 @@ describe("ThinkingState", () => {
 
     it("should clear all sessions when called multiple times", () => {
       state.sessions.set("tool1", {} as ReasoningSession);
-      
+
       state.reset();
       state.reset();
 

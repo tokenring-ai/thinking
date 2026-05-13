@@ -3,10 +3,10 @@
   "version": "0.2.0",
   "description": "Structured problem-solving framework using specialized \"thinking tools\" for complex logic.",
   "dependencies": {
-    "@tokenring-ai/app": "0.2.0",
-    "@tokenring-ai/chat": "0.2.0",
-    "@tokenring-ai/agent": "0.2.0",
-    "@tokenring-ai/utility": "0.2.0",
+    "@tokenring-ai/app": "workspace:*",
+    "@tokenring-ai/chat": "workspace:*",
+    "@tokenring-ai/agent": "workspace:*",
+    "@tokenring-ai/utility": "workspace:*",
     "zod": "^4.3.6"
   },
   "exports": {

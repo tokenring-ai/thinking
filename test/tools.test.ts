@@ -1,4 +1,4 @@
-import {describe, expect, it} from "vitest";
+import { describe, expect, it } from "vitest";
 import tools from "../tools";
 
 describe("Tools Module", () => {
@@ -36,15 +36,15 @@ describe("Tools Module", () => {
         expect(tool).toHaveProperty("inputSchema");
         expect(tool).toHaveProperty("execute");
         expect(typeof tool.execute).toBe("function");
-        
+
         // Name should be a non-empty string
         expect(typeof tool.name).toBe("string");
         expect(tool.name.length).toBeGreaterThan(0);
-        
+
         // Description should be comprehensive
         expect(typeof tool.description).toBe("string");
         expect(tool.description.length).toBeGreaterThan(10);
-        
+
         // inputSchema should be a Zod schema
         expect(tool.inputSchema).toHaveProperty("parse");
       });
@@ -61,7 +61,7 @@ describe("Tools Module", () => {
     it("should have unique names for all tools", () => {
       const names = Object.values(tools).map(tool => tool.name);
       const uniqueNames = [...new Set(names)];
-      
+
       expect(uniqueNames.length).toBe(names.length);
     });
   });
@@ -76,10 +76,10 @@ describe("Tools Module", () => {
     it("should mention key concepts in descriptions", () => {
       expect(tools.scientificMethod.description.toLowerCase()).toContain("hypothesis");
       expect(tools.scientificMethod.description.toLowerCase()).toContain("scientific");
-      
+
       expect(tools.decisionMatrix.description).toContain("decision");
       expect(tools.decisionMatrix.description.toLowerCase()).toContain("criteria");
-      
+
       expect(tools.firstPrinciples.description.toLowerCase()).toContain("fundamental");
       expect(tools.firstPrinciples.description.toLowerCase()).toContain("principles");
     });
@@ -98,15 +98,15 @@ describe("Tools Module", () => {
     it("should have required fields in schemas", () => {
       Object.values(tools).forEach(tool => {
         const schema = tool.inputSchema;
-        
+
         // Most tools should require step, content, and nextThoughtNeeded
         expect(schema.shape).toHaveProperty("step");
         expect(schema.shape).toHaveProperty("content");
         expect(schema.shape).toHaveProperty("nextThoughtNeeded");
-        
+
         // Step should be an enum
         expect(schema.shape.step._def.type).toBe("enum");
-        
+
         // nextThoughtNeeded should be boolean
         expect(schema.shape.nextThoughtNeeded._def.type).toBe("boolean");
       });
@@ -145,7 +145,7 @@ describe("Tools Module", () => {
       // Verify the tools object has the right structure
       expect(typeof tools).toBe("object");
       expect(tools).not.toBeNull();
-      
+
       // Verify it's not a default export that might cause issues
       expect(tools).toHaveProperty("scientificMethod");
       expect(tools).toHaveProperty("decisionMatrix");

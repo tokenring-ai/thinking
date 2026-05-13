@@ -2,8 +2,8 @@ import Agent from "@tokenring-ai/agent/Agent";
 import createTestingAgent from "@tokenring-ai/agent/test/createTestingAgent";
 import TokenRingApp from "@tokenring-ai/app";
 import createTestingApp from "@tokenring-ai/app/test/createTestingApp";
-import {afterEach, beforeEach, describe, expect, it, vi} from "vitest";
-import {ThinkingState} from "../state/thinkingState";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ThinkingState } from "../state/thinkingState";
 import ThinkingService from "../ThinkingService";
 
 describe("ThinkingService", () => {
@@ -35,7 +35,7 @@ describe("ThinkingService", () => {
     it("should initialize ThinkingState on agent", async () => {
       const newAgent = createTestingAgent(app);
       thinkingService.attach(newAgent);
-      
+
       expect(newAgent.getState(ThinkingState)).toBeDefined();
     });
   });
@@ -147,7 +147,7 @@ describe("ThinkingService", () => {
   describe("clearSession", () => {
     it("should remove specific session", () => {
       const mockProcessor = vi.fn((session, args) => ({}));
-      
+
       thinkingService.processStep("tool1", { problem: "Problem 1", step: "step1", nextThoughtNeeded: true }, agent, mockProcessor);
       thinkingService.processStep("tool2", { problem: "Problem 2", step: "step1", nextThoughtNeeded: true }, agent, mockProcessor);
 
@@ -166,7 +166,7 @@ describe("ThinkingService", () => {
   describe("clearAll", () => {
     it("should clear all sessions", () => {
       const mockProcessor = vi.fn((session, args) => ({}));
-      
+
       thinkingService.processStep("tool1", { problem: "Problem 1", step: "step1", nextThoughtNeeded: true }, agent, mockProcessor);
       thinkingService.processStep("tool2", { problem: "Problem 2", step: "step1", nextThoughtNeeded: true }, agent, mockProcessor);
       thinkingService.processStep("tool3", { problem: "Problem 3", step: "step1", nextThoughtNeeded: true }, agent, mockProcessor);
@@ -186,7 +186,7 @@ describe("ThinkingService", () => {
       const faultyProcessor = () => {
         throw new Error("Processor error");
       };
-      
+
       const args = {
         problem: "Test problem",
         step: "test-step",

@@ -1,4 +1,4 @@
-import {beforeEach, describe, expect, it, vi} from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import decisionMatrix from "../tools/decisionMatrix";
 
 // Mock Agent
@@ -112,7 +112,7 @@ describe("decisionMatrix Tool", () => {
 
     it("should add multiple options", async () => {
       const options = ["JavaScript", "TypeScript", "Python", "Go"];
-      
+
       for (let i = 0; i < options.length; i++) {
         const args = {
           step: "list_options",
