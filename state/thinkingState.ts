@@ -1,34 +1,34 @@
 import type { Agent } from "@tokenring-ai/agent";
 import { AgentStateSlice } from "@tokenring-ai/agent/types";
+import deepClone from "@tokenring-ai/utility/object/deepClone";
 import markdownList from "@tokenring-ai/utility/string/markdownList";
 import { z } from "zod";
 
-export interface ReasoningSession {
-  tool: string;
-  problem: string;
-  stepNumber: number;
-  data: Record<string, any>;
-  completedSteps: string[];
-  complete: boolean;
-}
+const ReasoningSessionSchema = z.object({
+  tool: z.string(),
+  problem: z.string(),
+  stepNumber: z.number(),
+  data: z.record(z.string(), z.any()),
+  completedSteps: z.array(z.string()),
+  complete: z.boolean(),
+});
+
+export type ReasoningSession = z.infer<typeof ReasoningSessionSchema>;
 
 const serializationSchema = z.object({
-  sessions: z.any(),
+  sessions: z.record(z.string(), ReasoningSessionSchema),
 });
 
 export class ThinkingState extends AgentStateSlice<typeof serializationSchema> {
-  sessions: Map<string, ReasoningSession> = new Map();
+  sessions: Map<string, z.infer<typeof ReasoningSessionSchema>> = new Map();
 
-  constructor(data: Partial<ThinkingState> = {}) {
+  constructor() {
     super("ThinkingState", serializationSchema);
-    if (data.sessions) {
-      this.sessions = new Map(data.sessions.entries());
-    }
   }
 
   transferStateFromParent(parent: Agent): void {
     const parentState = parent.getState(ThinkingState);
-    this.deserialize(parentState.serialize());
+    this.sessions = new Map([...parentState.sessions.entries()].map(([key, session]) => [key, deepClone(session)]));
   }
 
   reset(): void {
